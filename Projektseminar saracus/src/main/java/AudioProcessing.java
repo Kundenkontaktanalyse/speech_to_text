@@ -122,7 +122,7 @@ class AudioProcessing extends FileChooser {
 				File destinationFile = new File(destinationFileName);
 				AudioSystem.write(shortenedStream, fileFormat.getType(), destinationFile);
 				recognize(destinationFileName);
-							
+				destinationFile.delete();			
 				
 
 			}
@@ -144,6 +144,7 @@ class AudioProcessing extends FileChooser {
 				}
 		}
 	}
+	
 	
 	
 }
