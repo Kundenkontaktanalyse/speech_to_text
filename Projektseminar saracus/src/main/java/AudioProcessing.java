@@ -27,6 +27,7 @@ import com.google.protobuf.ByteString;
 // Benennung korrekt
 // Aufteilung funktioniert 
 
+
 class AudioProcessing extends FileChooser {
 	
 	public static void recognize(String fileName) throws Exception, IOException {
