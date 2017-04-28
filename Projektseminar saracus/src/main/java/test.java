@@ -1,4 +1,0 @@
-//sss
-public class test {
-
-}
