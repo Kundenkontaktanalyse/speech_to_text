@@ -29,8 +29,9 @@ import com.google.protobuf.ByteString;
 
 
 class AudioProcessing extends FileChooser {
+	TextBundler bundler= new TextBundler();
 	
-	public static void recognize(String fileName) throws Exception, IOException {
+	public void recognize(String fileName) throws Exception, IOException {
 		  SpeechClient speech = SpeechClient.create();
 
 		  Path path = Paths.get(fileName);
@@ -54,14 +55,15 @@ class AudioProcessing extends FileChooser {
 		  for (SpeechRecognitionResult result: results) {
 		    List<SpeechRecognitionAlternative> alternatives = result.getAlternativesList();
 		    for (SpeechRecognitionAlternative alternative: alternatives) {
-		      System.out.printf("Transcription: %s%n", alternative.getTranscript());
+		     // System.out.printf("Transcription: %s%n", alternative.getTranscript());
+		      bundler.addText(alternative.getTranscript());
 		    }
 		  }
 		  speech.close();
 		}
 	
 	
-	public static void processAudio() {
+	public void processAudio() {
 		String sourceFileName = choose() ;
 		String destinationFileName = sourceFileName;
 		AudioInputStream inputStream = null;
@@ -121,7 +123,7 @@ class AudioProcessing extends FileChooser {
 
 				File destinationFile = new File(destinationFileName);
 				AudioSystem.write(shortenedStream, fileFormat.getType(), destinationFile);
-				recognize(destinationFileName);
+				this.recognize(destinationFileName);
 				destinationFile.delete();			
 				
 
