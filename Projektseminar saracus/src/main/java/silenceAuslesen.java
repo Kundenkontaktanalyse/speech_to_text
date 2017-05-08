@@ -16,7 +16,7 @@ public class silenceAuslesen {
         		+ "ffmpeg " + "-i " + fileName + " -af silencedetect=noise=-50dB:d=1 -f null -"); //Befehl
         
        // TODO silence mit
-         
+         //hallo
         silenceAusleser.redirectErrorStream(true);
         Process p = silenceAusleser.start();
         BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
