@@ -9,6 +9,6 @@ public class SpeechToText extends AudioProcessing {
 		process.asyncRecognizeGcs("gs://audio_projektseminar/TestDateien/channel1.wav");
 		 
 		
-		//test git 14:11
+		
 		}
 }
