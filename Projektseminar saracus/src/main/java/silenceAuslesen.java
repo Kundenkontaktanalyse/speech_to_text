@@ -1,41 +1,33 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.FileWriter;
+
 
 public class silenceAuslesen {
-	
-	static String fileName = "channel1.wav"; // Variable für Dateinamen
-	final static String VERZEICHNIS = ("C:\\Users\\a_orsc01\\Desktop\\newfile.txt\");
-	
-    public static void main(String[] args) throws Exception {
-    	
-    	 
-              try
-              {
-                  BufferedReader bReader = new BufferedReader(new FileReader(VERZEICHNIS));
-                  
-                  String Hallo = null;
-                  String Zeile = bReader.readLine();
-                  while (true)
-                  {
-                      Zeile = bReader.readLine();
-                      if (Zeile.contains("silence_start"))
-                      {
-                    	  Hallo = Zeile;
-                      }  
-                       
-                      if (Zeile == null) { break; }
-                      
-                      System.out.println(Hallo);
-                     
-                  }
-              }
-              catch(IOException ioe)
-              {
-                  ioe.printStackTrace();
-              }
-          
-    }}
-    
 
+	static String fileName = "channel1.wav"; // Variable für Dateinamen
+	final static String VERZEICHNIS = ("C:\\Users\\a_orsc01\\Desktop\\newfile.txt");
+
+	public static void main(String[] args) throws Exception {
+
+		BufferedReader bReader = new BufferedReader(new FileReader(VERZEICHNIS));
+		BufferedWriter out = new BufferedWriter(new FileWriter("C:\\Users\\a_orsc01\\Desktop\\newfile2.txt"));
+		
+		
+		
+		
+		
+		while (true) {
+			String Zeile = bReader.readLine();
+			if (Zeile == null) { break; }
+			if (Zeile.contains("silence_end")) {
+				out.write(Zeile);
+				
+			}
+			
+		}
+out.close();
+bReader.close();
+	}
+}
