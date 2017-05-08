@@ -1,8 +1,6 @@
 import java.io.*;
 import com.google.gson.*;
-import com.google.gson.stream.JsonWriter;
 
-import java.io.*;
 
 public class TextBundler {
 	 private String finalerOutput;
@@ -54,14 +52,14 @@ private void speichereOutput(){
 }
 
 public void generiereJSON() throws JsonIOException, IOException{
-	FileOutputStream outputStream;
-	String filename="test.json";
-	JSONSetting jsonSettings=new JSONSetting(uuid.generiereStringID(), getFinalerOutput(), 3);
+	String id=uuid.generiereStringID();
+	String filename="Gespräch"+id+".json";
+	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), 3);
 	String json=gson.toJson(jsonSettings);
 
 	
 	try{ 
-	FileWriter writer = new FileWriter("C:/Users/t_diek09/Desktop/testdaten/test.json");
+	FileWriter writer = new FileWriter("C:/Users/t_diek09/Desktop/testdaten/"+filename);
 	writer.write(json);
 	writer.close();
 	}catch(IOException e){
