@@ -1,7 +1,3 @@
-/**
- * FileSplitter unfertig; Ich verstehe nicht, was zu was gehört.
- */
- 
 
 import java.io.*;
 import java.nio.file.Files;
@@ -27,59 +23,59 @@ import com.google.protobuf.ByteString;
 // Benennung korrekt
 // Aufteilung funktioniert 
 
-
 class AudioProcessing extends FileChooser {
-	TextBundler bundler= new TextBundler();
-	
+	TextBundler bundler = new TextBundler();
+	String sourceFileName;
+
 	public void recognize(String fileName) throws Exception, IOException {
-		  SpeechClient speech = SpeechClient.create();
+		SpeechClient speech = SpeechClient.create();
 
-		  Path path = Paths.get(fileName);
-		  byte[] data = Files.readAllBytes(path);
-		  ByteString audioBytes = ByteString.copyFrom(data);
+		Path path = Paths.get(fileName);
+		byte[] data = Files.readAllBytes(path);
+		ByteString audioBytes = ByteString.copyFrom(data);
 
-		  // Configure request with local raw PCM audio
-		  RecognitionConfig config = RecognitionConfig.newBuilder()
-		      .setEncoding(AudioEncoding.LINEAR16)
-		      .setLanguageCode("de-DE")
-		      .setSampleRateHertz(44100)
-		      .build();
-		  RecognitionAudio audio = RecognitionAudio.newBuilder()
-		      .setContent(audioBytes)
-		      .build();
+		// Configure request with local raw PCM audio
+		RecognitionConfig config = RecognitionConfig.newBuilder().setEncoding(AudioEncoding.LINEAR16)
+				.setLanguageCode("de-DE")//.setSampleRateHertz(44100) // automatisch
+																	// erkennen
+				.build();
+		RecognitionAudio audio = RecognitionAudio.newBuilder().setContent(audioBytes).build();
 
-		  // Use blocking call to get audio transcript
-		  RecognizeResponse response = speech.recognize(config, audio);
-		  List<SpeechRecognitionResult> results = response.getResultsList();
+		// Use blocking call to get audio transcript
+		RecognizeResponse response = speech.recognize(config, audio);
+		List<SpeechRecognitionResult> results = response.getResultsList();
 
-		  for (SpeechRecognitionResult result: results) {
-		    List<SpeechRecognitionAlternative> alternatives = result.getAlternativesList();
-		    for (SpeechRecognitionAlternative alternative: alternatives) {
-		     // System.out.printf("Transcription: %s%n", alternative.getTranscript());
-		      bundler.addText(alternative.getTranscript());
-		    }
-		  }
-		  speech.close();
+		for (SpeechRecognitionResult result : results) {
+			List<SpeechRecognitionAlternative> alternatives = result.getAlternativesList();
+			for (SpeechRecognitionAlternative alternative : alternatives) {
+				// System.out.printf("Transcription: %s%n",
+				// alternative.getTranscript());
+				bundler.addTextSync(alternative.getTranscript());
+			}
 		}
-	
-	
+		speech.close();
+	}
+
+	public String getSourceFileName() {
+		return sourceFileName;
+	}
+
 	public void processAudio() {
-		String sourceFileName = choose() ;
-		String destinationFileName = sourceFileName;
+		File sourceFile = choose();
+		String sourceFilePath = sourceFile. getPath().toString();
+		String destinationFilePath = sourceFilePath;
 		AudioInputStream inputStream = null;
 		AudioInputStream shortenedStream = null;
 		int secondsToCopy = 50;
 
 		try {
-			File file = new File(sourceFileName);
+			File file = new File(sourceFilePath);
 			AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(file);
-			
-			
+
 			AudioFormat format = fileFormat.getFormat();
 			inputStream = AudioSystem.getAudioInputStream(file); // eine ID
 			double audioFileLength = file.length(); // get Length des inputs
-			
-			
+
 			int bytesPerSecond = format.getFrameSize() * (int) format.getFrameRate(); // hz*bytes/frames
 			double audioSekunden = audioFileLength / bytesPerSecond;
 			int längeAudio = (int) audioSekunden + 1; // aufrunden der Sekunden
@@ -91,41 +87,35 @@ class AudioProcessing extends FileChooser {
 				AnzahlSchnitte += 1;
 			}
 
-			String origdestinationFileName = destinationFileName;
+			String origdestinationFilePath = destinationFilePath;
 
-			
-			
 			// Gedankenfalle skip:
-			// Vermutung: Durch die Erstellung des shortenedStream wird intern ein Marker weitergesetzt, der das skip unnötig werden lässt
+			// Vermutung: Durch die Erstellung des shortenedStream wird intern
+			// ein Marker weitergesetzt, der das skip unnötig werden lässt
 			// ansonsten zweimaliges Überspringen mit lücken
 
 			for (int i = 1; i <= AnzahlSchnitte; i++) {
-				
-				
-				destinationFileName = origdestinationFileName;
-				
-				
+
+				destinationFilePath = origdestinationFilePath;
 
 				shortenedStream = new AudioInputStream(inputStream, format, framesOfAudioToCopy);
-				
 
 				// bisher nur .wav, später flexibel gestalten evt.
-				int pfadlaenge = destinationFileName.length();
-				
+				int pfadlaenge = destinationFilePath.length();
+
 				String insert = null;
-				if (i<10){
+				if (i < 10) {
 					insert = "_0";
 				} else {
 					insert = "_";
 				}
-				destinationFileName = destinationFileName.substring(0, pfadlaenge - 4) + insert + i
-						+ destinationFileName.substring(pfadlaenge - 4, pfadlaenge);
+				destinationFilePath = destinationFilePath.substring(0, pfadlaenge - 4) + insert + i
+						+ destinationFilePath.substring(pfadlaenge - 4, pfadlaenge);
 
-				File destinationFile = new File(destinationFileName);
+				File destinationFile = new File(destinationFilePath);
 				AudioSystem.write(shortenedStream, fileFormat.getType(), destinationFile);
-				this.recognize(destinationFileName);
-				destinationFile.delete();			
-				
+				this.recognize(destinationFilePath);
+				destinationFile.delete();
 
 			}
 
@@ -146,7 +136,5 @@ class AudioProcessing extends FileChooser {
 				}
 		}
 	}
-	
-	
-	
+
 }
