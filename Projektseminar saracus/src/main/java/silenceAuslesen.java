@@ -27,7 +27,7 @@ public class silenceAuslesen {
 			}
 			
 		}
-out.close();
-bReader.close();
+		out.close();
+		bReader.close();
 	}
 }
