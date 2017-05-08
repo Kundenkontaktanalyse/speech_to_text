@@ -36,8 +36,8 @@ class AudioProcessing extends FileChooser {
 
 		// Configure request with local raw PCM audio
 		RecognitionConfig config = RecognitionConfig.newBuilder().setEncoding(AudioEncoding.LINEAR16)
-				.setLanguageCode("de-DE")//.setSampleRateHertz(44100) // automatisch
-																	// erkennen
+				.setLanguageCode("de-DE")//.setSampleRateHertz(44100) // wird automatisch erkannt
+																	
 				.build();
 		RecognitionAudio audio = RecognitionAudio.newBuilder().setContent(audioBytes).build();
 

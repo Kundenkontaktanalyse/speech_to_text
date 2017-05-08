@@ -13,6 +13,17 @@ import java.io.File;
  * diese übersetzt und ermittelt Werte, von denen der übersetzte Text in line 53 dem textbundler übergeben wird
  * dieser buffert die einzelnen textteile und schreibt sie in eine vom FileWriter erstellte (?) neue Datei
  *  
+ *  
+ * Ziel / to-do:
+ * 
+ *  FileChooser nimmt einen Audioschnitt an
+ *  Sprung ins Überverzeichnis
+ *  Ablegen aller Audio-Dateien (Filter!) im Verzeichnis (inklusive initial gewählter) in File[]
+ *  Sortieren der Files im Array nach alphabetischer reihenfolge (nummer aufsteigend am ende)
+ *  Auslesen der Startzeiten aus TXT-Datei in Startzeiten[]
+ *  Sortieren der Files nach Zeit
+ *  Transkription der einzelnen Dateien 
+ *  Abspeichern der einzelnen Outputs mit "Dialogtrenner" per Current_speaker variable
  */
 
 public class SpeakerSeperation extends AudioProcessing {
