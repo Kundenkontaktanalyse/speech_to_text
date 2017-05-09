@@ -3,10 +3,15 @@
  */
 public class SpeechToText extends AudioProcessing {
 	public static void main(String... args) throws Exception {
-		 AudioProcessing audio= new AudioProcessing();
-		  audio.processAudio();
+//		 AudioProcessing audio= new AudioProcessing();
+//		  audio.processAudio();
 //		AsyncProcess process= new AsyncProcess();
 //		process.asyncRecognizeGcs("gs://audio_projektseminar/TestDateien/channel1.wav");
+		SpeakerSeperation spsep = new SpeakerSeperation();
+		spsep.initalizeData();
+//		test mytest = new test();
+//		mytest.TextToTime(startingtimes);();
+		
 		 
 		
 		
