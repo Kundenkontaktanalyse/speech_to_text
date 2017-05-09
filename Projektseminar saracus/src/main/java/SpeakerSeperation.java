@@ -28,7 +28,8 @@ import java.util.Arrays;
  *  Ablegen aller Audio-Dateien (Filter!) im Verzeichnis (inklusive initial gewählter) in File[] CHECK
  *  Sortieren der Files im Array nach alphabetischer reihenfolge (nummer aufsteigend am ende) CHECK
  *  Auslesen der Startzeiten aus TXT-Datei in Startzeiten[] CHECK
- *  Sortieren der Files nach Zeit
+ *  Erzeugen von File][]KU und File[]CA  CHECK
+ *  
  *  Transkription der einzelnen Dateien in String[]
  *  Abspeichern der einzelnen Outputs mit "Dialogtrenner" per Current_speaker variable in finalem output
  */
@@ -38,6 +39,8 @@ public class SpeakerSeperation extends AudioProcessing {
 	File sourceFile;
 	File ParentsourceFile;
 	File[] audiofiles;
+	File[] audiofilesKU;
+	File[] audiofilesCA;
 	File[] textfiles;
 	int[] startzeitenKU;
 	int[] startzeitenCA;
@@ -72,12 +75,11 @@ public class SpeakerSeperation extends AudioProcessing {
 		Arrays.sort(audiofiles); // alphabetische Sortierung scheint automatisch
 									// zu erfolgen, wegen hinweis der API
 									// nochmal zur Sicherheit
-		if (audiofiles != null) { // Erforderliche Berechtigungen etc. sind
-									// vorhanden
-//			for (int i = 0; i < audiofiles.length; i++) {
-//				System.out.println(audiofiles[i].getAbsolutePath());
-//			}
-		}
+		// if (audiofiles != null) {
+		// for (int i = 0; i < audiofiles.length; i++) {
+		// System.out.println(audiofiles[i].getAbsolutePath());
+		// }
+		// }
 
 		// Ablage aller Textdateien des Verzeichnisses in textfiles[]
 		textfiles = ParentsourceFile.listFiles(new TextFilter());
@@ -86,9 +88,9 @@ public class SpeakerSeperation extends AudioProcessing {
 								// zur Sicherheit
 		if (textfiles != null) { // Erforderliche Berechtigungen etc. sind
 									// vorhanden
-//			for (int i = 0; i < textfiles.length; i++) {
-//				System.out.println(textfiles[i].getAbsolutePath());
-//			}
+			// for (int i = 0; i < textfiles.length; i++) {
+			// System.out.println(textfiles[i].getAbsolutePath());
+			// }
 		}
 	}
 
@@ -114,7 +116,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-//		System.out.println("Anzahl: " + count);
+		// System.out.println("Anzahl: " + count);
 		zeiten = new int[count];
 
 		// Abschnitt zum Schreiben der Zeiten in ein Int[], erneutes Einlesen
@@ -134,27 +136,130 @@ public class SpeakerSeperation extends AudioProcessing {
 			}
 		}
 
-//		for (int i = 0; i < zeiten.length; i++) {
-//			System.out.println(zeiten[i]);
-//		}
+		// for (int i = 0; i < zeiten.length; i++) {
+		// System.out.println(zeiten[i]);
+		// }
 		return zeiten;
 
 	}
 
+	// Methode liest durch getDataToArrays() die Dateien ein und generiert die
+	// StartzeitenArrays
 	public void initalizeData() {
 		getDataToArrays();
 		startzeitenKU = TextToTime(textfiles[0]);
 		startzeitenCA = TextToTime(textfiles[1]);
-//		System.out.println(textfiles[0]);
-//		System.out.println(textfiles[1]);
-//		for(int i = 0; i<startzeitenKU.length;i++){
-//			System.out.println(startzeitenKU[i]);
-//		}
-//		System.out.println();
-//		for(int i = 0; i<startzeitenCA.length;i++){
-//			System.out.println(startzeitenCA[i]);
-//		}
+		// System.out.println(textfiles[0]);
+		// System.out.println(textfiles[1]);
+		// for(int i = 0; i<startzeitenKU.length;i++){
+		// System.out.println(startzeitenKU[i]);
+		// }
+		// System.out.println();
+		// for(int i = 0; i<startzeitenCA.length;i++){
+		// System.out.println(startzeitenCA[i]);
+		// }
+		splitSpeaker();
+	}
+
+	public void splitSpeaker() {
+
+		audiofilesKU = new File[startzeitenKU.length];
+		audiofilesCA = new File[startzeitenCA.length];
+		int insertIntoKU = 0;
+		int insertIntoCA = 0;
+
+		for (int i = 0; i < audiofiles.length; i++) {
+			// identifikation der Sprecher anhand dateiname: 1.1.wav -> Speaker
+			// Kunde, 2.1.wav -> Speaker Agent
+			if (audiofiles[i].toString()
+					.substring(audiofiles[i].toString().length() - 7, audiofiles[i].toString().length() - 6)
+					.equals("1")) {
+				audiofilesKU[insertIntoKU] = audiofiles[i];
+				insertIntoKU++;
+			} else {
+				if (audiofiles[i].toString()
+						.substring(audiofiles[i].toString().length() - 7, audiofiles[i].toString().length() - 6)
+						.equals("2")) {
+					audiofilesCA[insertIntoCA] = audiofiles[i];
+					insertIntoCA++;
+				} else {
+					System.out.println("Fehler bei splitSpeaker");
+				}
+			}
+		}
+
+		// for (int i = 0; i < audiofilesKU.length; i++) {
+		// System.out.print(audiofilesKU[i].getAbsolutePath());
+		// if (audiofilesKU[i].isDirectory()) {
+		// System.out.print(" (Ordner)\n");
+		// } else {
+		// System.out.print(" (Datei)\n");
+		// }
+		// }
+		// System.out.println("-------------------");
+		// for (int i = 0; i < audiofilesCA.length; i++) {
+		// System.out.print(audiofilesCA[i].getAbsolutePath());
+		// if (audiofilesCA[i].isDirectory()) {
+		// System.out.print(" (Ordner)\n");
+		// } else {
+		// System.out.print(" (Datei)\n");
+		// }
+		// }
 
 	}
 
+	/*
+	 * =========================================================================
+	 * ================================================
+	 * =========================================================================
+	 * ================================================
+	 * 
+	 * Bis hierhin: Audio-Dateien werden in audiofilesKU[] (FILE) und
+	 * audiofilesCA[] eingelesen, Trennung der Speaker anhand Dateinamen
+	 * (siebt-letzter Character des Namens) Textdateien werden in
+	 * startzeitenKU[] (INT) und startzeitenCA eingelesen Funktionalität durch
+	 * auskommentierte Syso's kontrolliert.
+	 * 
+	 */
+	public void processFiles() {
+
+		initalizeData();
+
+		// Idee eines Stack:
+		// Zeiger auf jeweiligen Feldern, "abnehmen" des aktuellsten Elemts
+		// beider felder
+		
+		//Problem der Indizes: Falls ein Stack leer ist / der pointer eines Felds am Ende steht, vergleicht das Element des anderes Felds
+		// gegen Null(hinter das andere durch ++). Daher bisher unsauber: Falls letztes Element erreicht wurde startzeit des letzten Elements verändern sodass diese
+		// auf jeden fall höher als das andere Element ist
+		// TODO : Anpassen
+		
+		int currentPositionKU = 0;
+		int currentPositionCA = 0;
+
+		for (int i = 0; i < audiofiles.length; i++) {
+			if (startzeitenKU[currentPositionKU] < startzeitenCA[currentPositionCA]) {
+				bundler.addTextSync("\n Kunde:  " + currentPositionKU);
+				processAudio(audiofilesKU[currentPositionKU]);
+
+				if (currentPositionKU < startzeitenKU.length - 1) {
+					currentPositionKU++;
+				} else {
+					startzeitenKU[currentPositionKU] = startzeitenCA[currentPositionCA] + 99999;
+				}
+			} else {
+				if (startzeitenCA[currentPositionCA] < startzeitenKU[currentPositionKU])
+					bundler.addTextSync("\n Agent:  " + currentPositionCA);
+				processAudio(audiofilesCA[currentPositionCA]);
+				
+				if (currentPositionCA < startzeitenCA.length - 1) {
+					currentPositionCA++;
+				} else {
+					startzeitenCA[currentPositionCA] = startzeitenKU[currentPositionKU] + 99999;
+				}
+
+			}
+		}
+		bundler.speichereOutput();
+	}
 }

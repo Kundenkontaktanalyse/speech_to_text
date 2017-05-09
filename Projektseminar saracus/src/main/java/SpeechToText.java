@@ -8,9 +8,9 @@ public class SpeechToText extends AudioProcessing {
 //		AsyncProcess process= new AsyncProcess();
 //		process.asyncRecognizeGcs("gs://audio_projektseminar/TestDateien/channel1.wav");
 		SpeakerSeperation spsep = new SpeakerSeperation();
-		spsep.initalizeData();
+		spsep.processFiles();
 //		test mytest = new test();
-//		mytest.TextToTime(startingtimes);();
+//		mytest.test(startingtimes);
 		
 		 
 		

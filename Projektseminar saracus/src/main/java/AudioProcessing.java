@@ -60,8 +60,8 @@ class AudioProcessing extends FileChooser {
 		return sourceFileName;
 	}
 
-	public void processAudio() {
-		File sourceFile = choose();
+	public void processAudio(File sourceFile) {
+		 
 		String sourceFilePath = sourceFile. getPath().toString();
 		String destinationFilePath = sourceFilePath;
 		AudioInputStream inputStream = null;

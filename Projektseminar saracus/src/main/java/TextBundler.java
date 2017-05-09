@@ -19,27 +19,31 @@ public class TextBundler {
 			setFinalerOutput(a);
 
 		} else {
-			setFinalerOutput(getFinalerOutput() + " " + a);
+			setFinalerOutput(getFinalerOutput() + "\n " + a);
 		}
-		System.out.printf(getFinalerOutput());
-		speichereOutput();
+		System.out.println(getFinalerOutput());
+		System.out.println("-----------------");
+		//speichereOutput();
 
 	}
 
 	public void addTextAsync(String a) {
 		setFinalerOutput(a);
-		speichereOutput();
+	//speichereOutput();
 	}
 
-	private void speichereOutput() {
-		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter("test.txt"));
+	public void speichereOutput() {
+		
+			BufferedWriter out;
+			try {
+				out = new BufferedWriter(new FileWriter("C:/Users/d_tham01/workspace/hallo.txt"));
+			
 			out.write(getFinalerOutput()); 						
 			out.close();
 		} catch (IOException e) {
-			System.out.println("Exception ");
-
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 	}
-}
