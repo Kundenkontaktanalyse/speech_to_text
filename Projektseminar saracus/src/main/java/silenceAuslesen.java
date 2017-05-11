@@ -7,12 +7,12 @@ import java.io.FileWriter;
 public class silenceAuslesen {
 
 	static String fileName = "channel1.wav"; // Variable für Dateinamen
-	final static String VERZEICHNIS = ("C:\\Users\\a_orsc01\\Desktop\\newfile.txt");
+	final static String VERZEICHNIS = ("C:\\Users\\Alex\\Desktop\\newfile.txt");
 
 	public static void main(String[] args) throws Exception {
 
 		BufferedReader bReader = new BufferedReader(new FileReader(VERZEICHNIS));
-		BufferedWriter out = new BufferedWriter(new FileWriter("C:\\Users\\a_orsc01\\Desktop\\newfile2.txt"));
+		BufferedWriter out = new BufferedWriter(new FileWriter("C:\\Users\\Alex\\Desktop\\newfile2.txt"));
 		
 		
 		
