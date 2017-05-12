@@ -236,7 +236,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		
 		int currentPositionKU = 0;
 		int currentPositionCA = 0;
-
+//test-komment git
 		for (int i = 0; i < audiofiles.length; i++) {
 			if (startzeitenKU[currentPositionKU] < startzeitenCA[currentPositionCA]) {
 				bundler.addTextSync("\n Kunde:  " + currentPositionKU);
