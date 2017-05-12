@@ -11,8 +11,10 @@ public class SpeechToText extends AudioProcessing {
 		spsep.processFiles();
 //		test mytest = new test();
 //		mytest.test(startingtimes);
-		
-		 
+//		FileChooser myChooser = new FileChooser();
+//		test mytest = new test();
+//		mytest.TextToTime(myChooser.choose());
+//		 
 		
 		
 		}

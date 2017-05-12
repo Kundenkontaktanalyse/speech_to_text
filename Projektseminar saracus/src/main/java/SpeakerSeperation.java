@@ -31,7 +31,13 @@ import java.util.Arrays;
  *  Erzeugen von File][]KU und File[]CA  CHECK
  *  
  *  Transkription der einzelnen Dateien in String[]
- *  Abspeichern der einzelnen Outputs mit "Dialogtrenner" per Current_speaker variable in finalem output
+ *  Abspeichern der einzelnen Outputs mit "Dialogtrenner" CHECK
+ *  
+ *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ *  TODO:
+ *  - Input benennen, sodass 10ter schnitt keine stellenverschiebung generiert
+ *  - int[] der startzeiten zu double[] ändern
+ *  - + 99999 ausbessern mit "still-to-go" variable
  */
 
 public class SpeakerSeperation extends AudioProcessing {
@@ -86,18 +92,19 @@ public class SpeakerSeperation extends AudioProcessing {
 		Arrays.sort(textfiles); // alphabetische Sortierung scheint automatisch
 								// zu erfolgen, wegen hinweis der API nochmal
 								// zur Sicherheit
-		if (textfiles != null) { // Erforderliche Berechtigungen etc. sind
+//		if (textfiles != null) { // Erforderliche Berechtigungen etc. sind
 									// vorhanden
 			// for (int i = 0; i < textfiles.length; i++) {
 			// System.out.println(textfiles[i].getAbsolutePath());
 			// }
-		}
+//		}
 	}
 
 	// Methode zum Umwandeln einer Textdatei in ein Int[]
 	public int[] TextToTime(File startingtimes) {
 
 		int[] zeiten;
+		String inputString = null;
 
 		// Abschnitt zur Bestimmung der Anzahl der Startzeiten
 		BufferedReader br = null;
@@ -107,40 +114,68 @@ public class SpeakerSeperation extends AudioProcessing {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-
-		int count = 0;
 		try {
-			while (br.readLine() != null) {
-				count++;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			inputString = br.readLine();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
-		// System.out.println("Anzahl: " + count);
-		zeiten = new int[count];
+		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+		// ALTE VESION: Zeilenweises Auslesen der Zeiten
+//		int count = 0;
+//		try {
+//			while (br.readLine() != null) {
+//				count++;
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		// System.out.println("Anzahl: " + count);
+//		zeiten = new int[count];
+		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+		
 
+		// InputString bei Leerzeichen trennen ACHTUNG: Ein String mehr als Zeiten, da Trennung "vor" erstem String
+		String[] StringZeiten = inputString.split("\\s+");
+
+//		for (int i = 0; i < StringZeiten.length; i++) {
+//			System.out.println("ziffernString = " + StringZeiten[i]);
+//		}
+
+		// Strings in Integer parsen (stringArray besitzt als ersten string nur leerzeichen durch trennung, daher indexverschiebung)
+		zeiten = new int[StringZeiten.length - 1];
+		for (int i = 1; i < StringZeiten.length; i++) {
+			zeiten[i-1] = Integer.parseInt(StringZeiten[i]);
+		}
+
+//		for (int i = 0; i < zeiten.length; i++) {
+//			System.out.println("integerwert = " + zeiten[i]);
+//		}
+
+//		XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 		// Abschnitt zum Schreiben der Zeiten in ein Int[], erneutes Einlesen
-		// der Datei da Marker nach Durchlauf am Ende der Datei
+		// der Datei da Marker nach Durchlauf am Ende der Datei (Alte Versoin: Textdatei Zeilenweise einlesen)
 
-		try {
-			br = new BufferedReader(new InputStreamReader(new FileInputStream(startingtimes)));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		for (int i = 0; i < count; i++) {
-			try {
-				zeiten[i] = Integer.parseInt(br.readLine());
-			} catch (NumberFormatException | IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// for (int i = 0; i < zeiten.length; i++) {
-		// System.out.println(zeiten[i]);
+		// try {
+		// br = new BufferedReader(new InputStreamReader(new
+		// FileInputStream(startingtimes)));
+		// } catch (FileNotFoundException e) {
+		// e.printStackTrace();
 		// }
+		//
+		// for (int i = 0; i < anzahlZeiten; i++) {
+		// try {
+		// zeiten[i] = Integer.parseInt(br.readLine());
+		// } catch (NumberFormatException | IOException e) {
+		// e.printStackTrace();
+		// }
+		// }
+		//
+		// // for (int i = 0; i < zeiten.length; i++) {
+		// // System.out.println(zeiten[i]);
+		// // }
+		// return zeiten;
+//		XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 		return zeiten;
-
 	}
 
 	// Methode liest durch getDataToArrays() die Dateien ein und generiert die
@@ -149,15 +184,18 @@ public class SpeakerSeperation extends AudioProcessing {
 		getDataToArrays();
 		startzeitenKU = TextToTime(textfiles[0]);
 		startzeitenCA = TextToTime(textfiles[1]);
-		// System.out.println(textfiles[0]);
-		// System.out.println(textfiles[1]);
-		// for(int i = 0; i<startzeitenKU.length;i++){
-		// System.out.println(startzeitenKU[i]);
-		// }
-		// System.out.println();
-		// for(int i = 0; i<startzeitenCA.length;i++){
-		// System.out.println(startzeitenCA[i]);
-		// }
+//		 System.out.println(textfiles[0]);
+//		 System.out.println(textfiles[1]);
+//		 System.out.println("---------------");
+//		 System.out.println(startzeitenKU.length);
+//		 System.out.println(startzeitenCA.length);
+//		 for(int i = 0; i<startzeitenKU.length;i++){
+//		 System.out.println(startzeitenKU[i]);
+//		 }
+//		 System.out.println();
+//		 for(int i = 0; i<startzeitenCA.length;i++){
+//		 System.out.println(startzeitenCA[i]);
+//		 }
 		splitSpeaker();
 	}
 
