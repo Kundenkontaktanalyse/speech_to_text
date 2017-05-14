@@ -36,7 +36,7 @@ import java.util.Arrays;
  *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
  *  TODO:
  *  - Input benennen, sodass 10ter schnitt keine stellenverschiebung generiert
- *  - int[] der startzeiten zu double[] ändern
+ *  
  *  - + 99999 ausbessern mit "still-to-go" variable
  */
 
@@ -48,8 +48,8 @@ public class SpeakerSeperation extends AudioProcessing {
 	File[] audiofilesKU;
 	File[] audiofilesCA;
 	File[] textfiles;
-	int[] startzeitenKU;
-	int[] startzeitenCA;
+	double[] startzeitenKU;
+	double[] startzeitenCA;
 
 	/*
 	 * Methode zum Verarbeiten der Input-Dateien: Dateien werden nach Audio und
@@ -101,9 +101,9 @@ public class SpeakerSeperation extends AudioProcessing {
 	}
 
 	// Methode zum Umwandeln einer Textdatei in ein Int[]
-	public int[] TextToTime(File startingtimes) {
+	public double[] TextToTime(File startingtimes) {
 
-		int[] zeiten;
+		double[] zeiten;
 		String inputString = null;
 
 		// Abschnitt zur Bestimmung der Anzahl der Startzeiten
@@ -142,13 +142,13 @@ public class SpeakerSeperation extends AudioProcessing {
 //		}
 
 		// Strings in Integer parsen (stringArray besitzt als ersten string nur leerzeichen durch trennung, daher indexverschiebung)
-		zeiten = new int[StringZeiten.length - 1];
+		zeiten = new double[StringZeiten.length - 1];
 		for (int i = 1; i < StringZeiten.length; i++) {
-			zeiten[i-1] = Integer.parseInt(StringZeiten[i]);
+			zeiten[i-1] = Double.parseDouble(StringZeiten[i]);
 		}
 
 //		for (int i = 0; i < zeiten.length; i++) {
-//			System.out.println("integerwert = " + zeiten[i]);
+//			System.out.println("doublewert = " + zeiten[i]);
 //		}
 
 //		XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

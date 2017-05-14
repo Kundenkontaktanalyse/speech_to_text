@@ -3,7 +3,7 @@ import java.io.IOException;
 
 public class ffmpegClass extends FileChooser {
 
-	String ffmpegPfad = "cd \"C:\\Users\\d_tham01\\Desktop\\ffmpeg\\bin\"";
+	String ffmpegPfad = "cd \"C:\\Users\\Daniel\\Desktop\\ffmpeg\\bin\"";
 	String inputFileCA = choose().getName();
 	String inputFileKun = choose().getName();
 	String settingsFfmpeg = " -af silencedetect=noise=-50dB:d=1 -f null -";

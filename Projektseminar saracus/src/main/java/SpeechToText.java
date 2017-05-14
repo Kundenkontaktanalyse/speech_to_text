@@ -7,15 +7,15 @@ import java.io.IOException;
 public class SpeechToText extends AudioProcessing {
 	public static void main(String... args) throws Exception {
 
-//		File caOut = new File("C:\\Users\\d_tham01\\Desktop\\caOut.txt");
-//		File kunOut = new File("C:\\Users\\d_tham01\\Desktop\\kunOut.txt");
+//		File caOut = new File("C:\\Users\\Daniel\\Desktop\\Meeting\\caOut.txt");
+//		File kunOut = new File("C:\\Users\\Daniel\\Desktop\\Meeting\\kunOut.txt");
 //		ffmpegClass myffmpegClass = new ffmpegClass();
 //		myffmpegClass.pBuild(caOut, kunOut);
 
 		// -----------------------------------------------------------------------------------
 
-//		File catimes = new File("C:\\Users\\d_tham01\\Desktop\\catimes.txt");
-//		File kuntimes = new File("C:\\Users\\d_tham01\\Desktop\\kuntimes.txt");
+//		File catimes = new File("C:\\Users\\Daniel\\Desktop\\Meeting\\GeschnitteneAudios\\catimes.txt");
+//		File kuntimes = new File("C:\\Users\\Daniel\\Desktop\\Meeting\\GeschnitteneAudios\\kuntimes.txt");
 //
 //		TimesCut myTimesCut = new TimesCut();
 //
@@ -28,11 +28,11 @@ public class SpeechToText extends AudioProcessing {
 		SpeakerSeperation spsep = new SpeakerSeperation();
 		spsep.processFiles();
 
-		// test mytest = new test();
-		// mytest.test(startingtimes);
-		// FileChooser myChooser = new FileChooser();
-		// test mytest = new test();
-		// mytest.TextToTime(myChooser.choose());
+//		 test mytest = new test();
+//		 mytest.test(startingtimes);
+//		 FileChooser myChooser = new FileChooser();
+//		 SpeakerSeperation mytest = new SpeakerSeperation();
+//		 mytest.TextToTime(myChooser.choose());
 		//
 		// AudioProcessing audio= new AudioProcessing();
 		// audio.processAudio();

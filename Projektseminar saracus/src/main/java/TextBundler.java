@@ -36,7 +36,7 @@ public class TextBundler {
 
 		BufferedWriter out;
 		try {
-			out = new BufferedWriter(new FileWriter("C:/Users/d_tham01/workspace/gespraechsdialog.txt"));
+			out = new BufferedWriter(new FileWriter("C:\\Users\\Daniel\\Desktop\\Meeting\\gespraechsdialog.txt"));
 
 			out.write(getFinalerOutput());
 			out.close();

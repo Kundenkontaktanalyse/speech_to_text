@@ -12,7 +12,7 @@ public class silenceAuslesen {
         		
         	
         		"cmd.exe", "/c", //CMD Befehl
-        		"cd \"C:\\Users\\a_orsc01\\Desktop\\ffmpeg\\bin\" &&" //Pfad für Programm
+        		"cd \"C:\\Users\\Daniel\\Desktop\\ffmpeg\\bin\" &&" //Pfad für Programm
         		+ "ffmpeg " + "-i " + fileName + " -af silencedetect=noise=-50dB:d=1 -f null -"); //Befehl
         
        // TODO silence mit
