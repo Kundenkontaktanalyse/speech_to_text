@@ -12,6 +12,44 @@ public class JSONSetting {
 	private LinkedList<Float> konfidenzListe= new LinkedList<Float>();
 	
 	
+
+
+	public JSONSetting(String id, String transkription, double laenge, LinkedList<Float> konfidenzListe ){
+		this.konfidenzListe=konfidenzListe;
+		this.laenge=Math.round((laenge/60)*10000)/10000.0;
+		this.id=id;
+		this.transkription=transkription;
+		durchschnittsKonfidenzErmitteln();
+	}
+	
+
+	
+	private void durchschnittsKonfidenzErmitteln(){
+		LinkedList<Float> temp= new LinkedList<Float>();
+		temp=(LinkedList<Float>) getKonfidenzListe().clone();
+		int i=getKonfidenzListe().size();
+		
+		float summe=0;
+	while(!temp.isEmpty()){
+		Float b=temp.remove();
+		summe=summe+b;
+	}
+	setKonfidenzDurchschnitt(summe/i);
+		
+	}
+	public String getTranskription() {
+		return transkription;
+	}
+	public void setTranskription(String transkription) {
+		this.transkription = transkription;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public double getLaenge() {
 		return laenge;
 	}
@@ -35,45 +73,6 @@ public class JSONSetting {
 	public void setKonfidenzListe(LinkedList<Float> konfidenzListe) {
 		this.konfidenzListe = konfidenzListe;
 	}
-
-	public JSONSetting(String id, String transkription, double laenge, LinkedList<Float> konfidenzListe ){
-		this.konfidenzListe=konfidenzListe;
-		this.laenge=laenge;
-		this.id=id;
-		this.transkription=transkription;
-		durchschnittsKonfidenzErmitteln();
-	}
-	
-	private void durchschnittsKonfidenzErmitteln(){
-		int i=getKonfidenzListe().size();
-		float summe=0;
-	while(!konfidenzListe.isEmpty()){
-		Float b=konfidenzListe.remove();
-		summe=summe+b;
-	}
-	setKonfidenzDurchschnitt(summe/i);
-		
-	}
-	public String getTranskription() {
-		return transkription;
-	}
-	public void setTranskription(String transkription) {
-		this.transkription = transkription;
-	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-//	public double getLaenge() {
-//		return laenge;
-//	}
-//	public void setLaenge(double laenge) {
-//		this.laenge = laenge;
-//	}
-	
-
 	
 	
 

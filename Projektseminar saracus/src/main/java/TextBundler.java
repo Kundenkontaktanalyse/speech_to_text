@@ -26,13 +26,13 @@ public void setKonfidenz(float konfidenz){
 }
 
 public void addTextSync(String a, float k, double d){
+	konfidenzListe.add(k);
+	
 if(getFinalerOutput()==null){ setFinalerOutput(a);
-konfidenzListe.addFirst(k);
 //dauerListe.add(d);
 setDauer(d);
 }
-else{setFinalerOutput(getFinalerOutput()+" "+a);
-konfidenzListe.addFirst(k);}
+else{setFinalerOutput(getFinalerOutput()+" "+a);}
 //System.out.printf(getFinalerOutput());
 }
 
@@ -79,7 +79,7 @@ public void generiereJSON() throws JsonIOException, IOException{
 
 	
 	//System.out.println(konfidenzListeOutput);
-	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauer,konfidenzListe);
+	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauer, konfidenzListe);
 	String json=gson.toJson(jsonSettings);
 
 	

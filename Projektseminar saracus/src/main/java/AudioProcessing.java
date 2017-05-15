@@ -92,7 +92,7 @@ class AudioProcessing extends FileChooser {
 			double audioFileLength = file.length(); // get Length des inputs
 			inputStream = AudioSystem.getAudioInputStream(file);
 			sampleRate=(int) format.getSampleRate();
-			dauer=(inputStream.getFrameLength()/format.getFrameRate())/60;
+			dauer=(inputStream.getFrameLength()/format.getFrameRate());
 			
 			
 			
