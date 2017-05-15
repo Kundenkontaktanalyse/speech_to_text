@@ -6,6 +6,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import javax.sound.sampled.*;
+
+import com.google.api.client.util.Lists;
 import com.google.cloud.speech.spi.v1.SpeechClient;
 import com.google.cloud.speech.v1.RecognitionAudio;
 import com.google.cloud.speech.v1.RecognitionConfig;
@@ -27,6 +29,7 @@ import com.google.protobuf.ByteString;
 class AudioProcessing extends FileChooser {	
 	TextBundler bundler= new TextBundler();
 	int sampleRate;
+	double dauer;
 
 	
 	
@@ -39,7 +42,7 @@ class AudioProcessing extends FileChooser {
 		  ByteString audioBytes = ByteString.copyFrom(data);
 		  // Configure request with local raw PCM audio
 		  SpeechContext context=SpeechContext.newBuilder()
-				  .addPhrases("Boolean")
+				  .addPhrases("Boolean" )
 				  .addPhrases("building")
 				  .addPhrases("circuits")
 				  .addPhrases("switching")
@@ -51,7 +54,6 @@ class AudioProcessing extends FileChooser {
 		      .setLanguageCode("de-DE")
 		      .setSampleRateHertz(sampleRate)
 		      .addSpeechContexts(0, context)
-		      
 		      .build();
 				  
 		  RecognitionAudio audio = RecognitionAudio.newBuilder()
@@ -67,14 +69,16 @@ class AudioProcessing extends FileChooser {
 		    List<SpeechRecognitionAlternative> alternatives = result.getAlternativesList();
 		    for (SpeechRecognitionAlternative alternative: alternatives) {
 		     // System.out.printf("Transcription: %s%n", alternative.getTranscript());
-		      bundler.addTextSync(alternative.getTranscript());
+		      bundler.addTextSync(alternative.getTranscript(), alternative.getConfidence(), dauer);
+		      System.out.println(alternative.getConfidence());
 		    }
 		  }
 		  speech.close();
+		
 		}
 	
 	
-	public void processAudio() {
+	public void processAudio() throws IOException {
 		String sourceFileName = choose() ;
 		String destinationFileName = sourceFileName;
 		AudioInputStream inputStream = null;
@@ -88,6 +92,7 @@ class AudioProcessing extends FileChooser {
 			double audioFileLength = file.length(); // get Length des inputs
 			inputStream = AudioSystem.getAudioInputStream(file);
 			sampleRate=(int) format.getSampleRate();
+			dauer=(inputStream.getFrameLength()/format.getFrameRate())/60;
 			
 			
 			
@@ -156,6 +161,7 @@ class AudioProcessing extends FileChooser {
 					System.out.println(e);
 				}
 		}
+		bundler.generiereJSON();
 	}
 	
 	

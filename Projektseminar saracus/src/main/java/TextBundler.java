@@ -1,10 +1,16 @@
 import java.io.*;
 import com.google.gson.*;
+import java.util.LinkedList;
 
 
 public class TextBundler {
 	 private String finalerOutput;
-	 Gson gson= new GsonBuilder().setPrettyPrinting().create();
+	 private float konfidenz;
+	 private double dauer;
+	 private String konfidenzListeOutput;
+	 LinkedList<Float> konfidenzListe=new LinkedList<Float>();
+	 LinkedList<Double> dauerListe=new LinkedList<Double>();	 
+	 Gson gson= new GsonBuilder().create();
 	 GenerateUUID uuid=new GenerateUUID();
 	 
 
@@ -15,18 +21,40 @@ public String getFinalerOutput() {
 public void setFinalerOutput(String finalerOutput) {
 	this.finalerOutput = finalerOutput;
 }
+public void setKonfidenz(float konfidenz){
+	this.konfidenz=konfidenz;
+}
 
-public void addTextSync(String a){
+public void addTextSync(String a, float k, double d){
 if(getFinalerOutput()==null){ setFinalerOutput(a);
+konfidenzListe.add(k);
+//dauerListe.add(d);
+setDauer(d);
+setKonfidenz(k);
 
 }
 else{setFinalerOutput(getFinalerOutput()+" "+a);}
-System.out.printf(getFinalerOutput());
-speichereOutput();
+//System.out.printf(getFinalerOutput());
+
 
 }
 
+private void generiereDauer(){
+while(!konfidenzListe.isEmpty()){
+	Float b=konfidenzListe.removeLast();
+	this.konfidenzListeOutput=this.konfidenzListeOutput+String.valueOf(b)+" ";
+}
 
+}
+public double getDauer() {
+	return dauer;
+}
+public void setDauer(double dauer) {
+	this.dauer = dauer;
+}
+public float getKonfidenz() {
+	return konfidenz;
+}
 public void addTextAsync(String a) throws JsonIOException, IOException{
 	setFinalerOutput(a);
 	
@@ -51,10 +79,16 @@ private void speichereOutput(){
 	
 }
 
+
 public void generiereJSON() throws JsonIOException, IOException{
 	String id=uuid.generiereStringID();
 	String filename="Gespräch"+id+".json";
-	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), 3);
+	generiereDauer();
+	System.out.println(konfidenzListeOutput);
+
+	
+	//System.out.println(konfidenzListeOutput);
+	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauer,konfidenzListeOutput);
 	String json=gson.toJson(jsonSettings);
 
 	
@@ -68,6 +102,7 @@ public void generiereJSON() throws JsonIOException, IOException{
 	System.out.println(json);
 	
 }
+
 
 
 }

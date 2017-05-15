@@ -28,12 +28,12 @@ public class AsyncProcess {
 		TextBundler bundler=new TextBundler();
 		  // Instantiates a client with GOOGLE_APPLICATION_CREDENTIALS
 		  SpeechClient speech = SpeechClient.create();
-		  System.out.println(sampleRate);
+		//  System.out.println(sampleRate);
 		  // Configure remote file request for Linear16
 		  RecognitionConfig config = RecognitionConfig.newBuilder()
 		      .setEncoding(AudioEncoding.LINEAR16)
 		      .setLanguageCode("de-DE")
-		      .setSampleRateHertz(sampleRate)
+		      .setSampleRateHertz(16000)
 		      .build();
 		  RecognitionAudio audio = RecognitionAudio.newBuilder()
 		      .setUri(gcsUri)
@@ -55,6 +55,7 @@ public class AsyncProcess {
 		    for (SpeechRecognitionAlternative alternative: alternatives) {
 		    //  System.out.printf("Transcription: %s%n", alternative.getTranscript());
 		      bundler.addTextAsync(alternative.getTranscript());
+		      bundler.setKonfidenz(alternative.getConfidence());
 		    }
 		  }
 		  speech.close();
