@@ -16,13 +16,17 @@ public class JSONSetting {
 
 	public JSONSetting(String id, String transkription, double laenge, LinkedList<Float> konfidenzListe ){
 		this.konfidenzListe=konfidenzListe;
-		this.laenge=Math.round((laenge/60)*10000)/10000.0;
+		this.laenge=Math.round(sekInMin(laenge)*10000)/10000.0;
 		this.id=id;
 		this.transkription=transkription;
 		durchschnittsKonfidenzErmitteln();
 	}
 	
-
+private double sekInMin(double sek){
+	double sekTemp=(sek%60.0)*0.01;
+	int sekMin=(int)sek/60;
+	return (sekTemp+sekMin);
+}
 	
 	private void durchschnittsKonfidenzErmitteln(){
 		LinkedList<Float> temp= new LinkedList<Float>();
