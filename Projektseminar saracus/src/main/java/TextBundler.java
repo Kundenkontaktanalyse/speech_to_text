@@ -27,25 +27,16 @@ public void setKonfidenz(float konfidenz){
 
 public void addTextSync(String a, float k, double d){
 if(getFinalerOutput()==null){ setFinalerOutput(a);
-konfidenzListe.add(k);
+konfidenzListe.addFirst(k);
 //dauerListe.add(d);
 setDauer(d);
-setKonfidenz(k);
-
 }
-else{setFinalerOutput(getFinalerOutput()+" "+a);}
+else{setFinalerOutput(getFinalerOutput()+" "+a);
+konfidenzListe.addFirst(k);}
 //System.out.printf(getFinalerOutput());
-
-
 }
 
-private void generiereDauer(){
-while(!konfidenzListe.isEmpty()){
-	Float b=konfidenzListe.removeLast();
-	this.konfidenzListeOutput=this.konfidenzListeOutput+String.valueOf(b)+" ";
-}
 
-}
 public double getDauer() {
 	return dauer;
 }
@@ -83,12 +74,12 @@ private void speichereOutput(){
 public void generiereJSON() throws JsonIOException, IOException{
 	String id=uuid.generiereStringID();
 	String filename="Gespräch"+id+".json";
-	generiereDauer();
+	
 	System.out.println(konfidenzListeOutput);
 
 	
 	//System.out.println(konfidenzListeOutput);
-	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauer,konfidenzListeOutput);
+	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauer,konfidenzListe);
 	String json=gson.toJson(jsonSettings);
 
 	
