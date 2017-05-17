@@ -7,6 +7,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+
 /*Klasse zur Durchführung der Speakerseperation
  * Erwartet: FileChooser-Übergabe eines Verzeichnesses mit Unterordnern A und B mit jeweilig gecutteten Unterdateien A.1, A.2 etc 
  * 
@@ -23,6 +28,7 @@ import java.util.Arrays;
  *  
  * Ziel / to-do:
  * 
+ *  processFiles startet Prozess
  *  FileChooser nimmt einen Audioschnitt an CHECK
  *  Sprung ins Überverzeichnis CHECK
  *  Ablegen aller Audio-Dateien (Filter!) im Verzeichnis (inklusive initial gewählter) in File[] CHECK
@@ -30,15 +36,23 @@ import java.util.Arrays;
  *  Auslesen der Startzeiten aus TXT-Datei in Startzeiten[] CHECK
  *  Erzeugen von File][]KU und File[]CA  CHECK
  *  
- *  Transkription der einzelnen Dateien in String[]
+ *  Transkription der einzelnen Dateien in bufferedReader +
  *  Abspeichern der einzelnen Outputs mit "Dialogtrenner" CHECK
  *  
  *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
- *  TODO:
- *  - Input benennen, sodass 10ter schnitt keine stellenverschiebung generiert
  *  
- *  - + 99999 ausbessern mit "still-to-go" variable
- *  - cut methode schreiben
+ *  
+ *  ffmpeg textdateien:
+ *  1: CA-Startzeiten = C1.txt
+ *  2: CA-Endzeiten = C2.txt
+ *  3: KU-Startzeiten = K1.txt
+ *  4: KU-Endzeiten = K2.txt
+ *  
+ *  
+ *  TODO:
+ *  input datei beim schneiden löschen
+ *  cutMethode ins gesamtsystem einbetten
+ *  
  */
 
 public class SpeakerSeperation extends AudioProcessing {
@@ -53,6 +67,110 @@ public class SpeakerSeperation extends AudioProcessing {
 	double[] startzeitenCA;
 	double[] startzeitenKUrdy;
 	double[] startzeitenCArdy;
+
+	// Methode zum Schneiden von AudioDateien: Legt die AudioSchnitte im
+	// Verzeichnis der Audiodatei ab
+	// Bennennung der Dateien mit originalNamen + 00X für Anzahl
+	public void cutAudio(File sourceFile, double[] startzeiten, double[] endzeiten) {
+
+		String sourceFilePath = sourceFile.getPath().toString();
+		String destinationFilePath = sourceFilePath;
+		AudioInputStream inputStream = null;
+		AudioInputStream shortenedStream = null;
+		int AnzahlSchnitte = startzeiten.length;
+
+		if (startzeiten.length != endzeiten.length) {
+			System.out.println("Fehler bei Start/Endzeiten");
+		}
+
+		// Ermittlung der Länge der Einzelnen Gesprächsabschnitte und
+		// Gesprächspausen
+		double[] längeSchnitteSekunden = new double[startzeiten.length];
+		for (int i = 0; i < längeSchnitteSekunden.length; i++) {
+			längeSchnitteSekunden[i] = endzeiten[i] - startzeiten[i];
+		}
+		// for (int i = 0; i < längeSchnitte.length; i++) {
+		// System.out.println(längeSchnitte[i]);
+		// }
+
+		double[] längeSkipsSekunden = new double[startzeiten.length];
+		längeSkipsSekunden[0] = startzeiten[0];
+		for (int i = 1; i < längeSkipsSekunden.length; i++) {
+			längeSkipsSekunden[i] = startzeiten[i] - endzeiten[i - 1];
+		}
+
+		try {
+			File file = new File(sourceFilePath);
+			AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(file);
+
+			AudioFormat format = fileFormat.getFormat();
+			inputStream = AudioSystem.getAudioInputStream(file); // eine ID
+			// double audioFileLength = file.length(); // get byte-Length des
+			// inputs
+
+			int bytesPerSecond = format.getFrameSize() * (int) format.getFrameRate(); // hz*bytes/frames
+			// double audioSekunden = audioFileLength / bytesPerSecond;
+
+			long[] längeSkipsBytes = new long[längeSkipsSekunden.length];
+			for (int i = 0; i < längeSkipsBytes.length; i++) {
+				// cast zu long ohne +1, damit nicht zuviel geskippt wird
+				längeSkipsBytes[i] = (long) (längeSkipsSekunden[i] * bytesPerSecond);
+			}
+
+			String origdestinationFilePath = destinationFilePath;
+
+			for (int i = 1; i <= AnzahlSchnitte; i++) {
+
+				inputStream.skip(längeSkipsBytes[i - 1]);
+				// getFrameRate liefert float zurück, daher cast in l.54.
+				// AudioInputStream erwartet long, daher cast und +1 zum
+				// aufrunden
+				float framesOfAudioToCopy = (float) längeSchnitteSekunden[i - 1] * format.getFrameRate();
+
+				destinationFilePath = origdestinationFilePath;
+
+				shortenedStream = new AudioInputStream(inputStream, format, (long) (framesOfAudioToCopy + 1));
+
+				int pfadlaenge = destinationFilePath.length();
+
+				String insert = null;
+				if (i < 10) {
+					insert = "_00";
+				} else {
+					if (i < 100) {
+						insert = "_0";
+					} else {
+						insert = "_";
+					}
+
+				}
+				destinationFilePath = destinationFilePath.substring(0, pfadlaenge - 4) + insert + i
+						+ destinationFilePath.substring(pfadlaenge - 4, pfadlaenge);
+
+				File destinationFile = new File(destinationFilePath);
+				AudioSystem.write(shortenedStream, fileFormat.getType(), destinationFile);
+
+				// nach letztem Gesprächsanteil muss nicht mehr geskippt werden
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			if (inputStream != null)
+				try {
+					inputStream.close();
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+			if (shortenedStream != null)
+				try {
+					shortenedStream.close();
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+		}
+	}
 
 	/*
 	 * Methode zum Verarbeiten der Input-Dateien: Dateien werden nach Audio und
@@ -103,7 +221,8 @@ public class SpeakerSeperation extends AudioProcessing {
 		// }
 	}
 
-	// Methode zum Umwandeln einer Textdatei in ein Int[]
+	// Methode zum Umwandeln der Werte einer einzeiligen Textdatei in ein
+	// double[]
 	public double[] TextToTime(File startingtimes) {
 
 		double[] zeiten;
@@ -190,21 +309,21 @@ public class SpeakerSeperation extends AudioProcessing {
 		startzeitenCA = TextToTime(textfiles[0]);
 		startzeitenKU = TextToTime(textfiles[1]);
 		identifyStarter();
-		
-//		 System.out.println(textfiles[0]);
-//		 System.out.println(textfiles[1]);
-//		 System.out.println("---------------");
-//		 System.out.println(startzeitenKUrdy.length);
-//		 System.out.println(startzeitenCArdy.length);
-//		 for(int i = 0; i<startzeitenKUrdy.length;i++){
-//		 System.out.println(startzeitenKUrdy[i]);
-//		 }
-//		 System.out.println();
-//		 for(int i = 0; i<startzeitenCArdy.length;i++){
-//		 System.out.println(startzeitenCArdy[i]);
-//		 }
-		
-		 splitSpeaker();
+
+		// System.out.println(textfiles[0]);
+		// System.out.println(textfiles[1]);
+		// System.out.println("---------------");
+		// System.out.println(startzeitenKUrdy.length);
+		// System.out.println(startzeitenCArdy.length);
+		// for(int i = 0; i<startzeitenKUrdy.length;i++){
+		// System.out.println(startzeitenKUrdy[i]);
+		// }
+		// System.out.println();
+		// for(int i = 0; i<startzeitenCArdy.length;i++){
+		// System.out.println(startzeitenCArdy[i]);
+		// }
+
+		splitSpeaker();
 	}
 
 	// Methode zur Anpassung der double[] startzeiten: Einfügen einer 0.0 beim
@@ -235,6 +354,9 @@ public class SpeakerSeperation extends AudioProcessing {
 		}
 	}
 
+
+	// Methode zum Trennen der Redner:
+	// audioFiles[] wird aufgeteilt in audiofilesKU und audiofilesCA
 	public void splitSpeaker() {
 
 		audiofilesKU = new File[startzeitenKUrdy.length];
@@ -243,16 +365,17 @@ public class SpeakerSeperation extends AudioProcessing {
 		int insertIntoCA = 0;
 
 		for (int i = 0; i < audiofiles.length; i++) {
-			// identifikation der Sprecher anhand dateiname: 1.1.wav -> Speaker
-			// Kunde, 2.1.wav -> Speaker Agent
+			// identifikation der Sprecher anhand dateiname: K_001.wav ->
+			// Speaker
+			// Kunde, C_001.wav -> Speaker Agent => 9t letzte Stelle des Strings
 			if (audiofiles[i].toString()
-					.substring(audiofiles[i].toString().length() - 7, audiofiles[i].toString().length() - 6)
+					.substring(audiofiles[i].toString().length() - 9, audiofiles[i].toString().length() - 8)
 					.equals("K")) {
 				audiofilesKU[insertIntoKU] = audiofiles[i];
 				insertIntoKU++;
 			} else {
 				if (audiofiles[i].toString()
-						.substring(audiofiles[i].toString().length() - 7, audiofiles[i].toString().length() - 6)
+						.substring(audiofiles[i].toString().length() - 9, audiofiles[i].toString().length() - 8)
 						.equals("C")) {
 					audiofilesCA[insertIntoCA] = audiofiles[i];
 					insertIntoCA++;
@@ -262,23 +385,23 @@ public class SpeakerSeperation extends AudioProcessing {
 			}
 		}
 
-//		 for (int i = 0; i < audiofilesKU.length; i++) {
-//		 System.out.print(audiofilesKU[i].getAbsolutePath());
-//		 if (audiofilesKU[i].isDirectory()) {
-//		 System.out.print(" (Ordner)\n");
-//		 } else {
-//		 System.out.print(" (Datei)\n");
-//		 }
-//		 }
-//		 System.out.println("-------------------");
-//		 for (int i = 0; i < audiofilesCA.length; i++) {
-//		 System.out.print(audiofilesCA[i].getAbsolutePath());
-//		 if (audiofilesCA[i].isDirectory()) {
-//		 System.out.print(" (Ordner)\n");
-//		 } else {
-//		 System.out.print(" (Datei)\n");
-//		 }
-//		 }
+		// for (int i = 0; i < audiofilesKU.length; i++) {
+		// System.out.print(audiofilesKU[i].getAbsolutePath());
+		// if (audiofilesKU[i].isDirectory()) {
+		// System.out.print(" (Ordner)\n");
+		// } else {
+		// System.out.print(" (Datei)\n");
+		// }
+		// }
+		// System.out.println("-------------------");
+		// for (int i = 0; i < audiofilesCA.length; i++) {
+		// System.out.print(audiofilesCA[i].getAbsolutePath());
+		// if (audiofilesCA[i].isDirectory()) {
+		// System.out.print(" (Ordner)\n");
+		// } else {
+		// System.out.print(" (Datei)\n");
+		// }
+		// }
 
 	}
 
@@ -305,34 +428,38 @@ public class SpeakerSeperation extends AudioProcessing {
 
 		// Problem der Indizes: Falls ein Stack leer ist / der pointer eines
 		// Felds am Ende steht, vergleicht das Element des anderes Felds
-		// gegen Null(hinter das andere durch ++). Daher bisher unsauber: Falls
-		// letztes Element erreicht wurde startzeit des letzten Elements
-		// verändern sodass diese
-		// auf jeden fall höher als das andere Element ist
-		// TODO : Anpassen
+		// gegen Null(hinter das andere durch ++).
+		// Daher boolean falls komplett durchlaufen
 
 		int currentPositionKU = 0;
 		int currentPositionCA = 0;
+		boolean KUfinished = false;
+		boolean CAfinished = false;
 
 		for (int i = 0; i < audiofiles.length; i++) {
-			if (startzeitenKUrdy[currentPositionKU] < startzeitenCArdy[currentPositionCA]) {
+			if ((startzeitenKUrdy[currentPositionKU] < startzeitenCArdy[currentPositionCA]) || (CAfinished)) {
 				bundler.addTextSync("\n Kunde:  " + currentPositionKU);
 				processAudio(audiofilesKU[currentPositionKU]);
 
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
 					currentPositionKU++;
 				} else {
-					startzeitenKUrdy[currentPositionKU] = startzeitenCArdy[currentPositionCA] + 99999;
+					// startzeitenKUrdy[currentPositionKU] =
+					// startzeitenCArdy[currentPositionCA] + 99999;
+					KUfinished = true;
 				}
 			} else {
-				if (startzeitenCArdy[currentPositionCA] < startzeitenKUrdy[currentPositionKU])
+				if ((startzeitenCArdy[currentPositionCA] < startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
 					bundler.addTextSync("\n Agent:  " + currentPositionCA);
-				processAudio(audiofilesCA[currentPositionCA]);
+					processAudio(audiofilesCA[currentPositionCA]);
 
-				if (currentPositionCA < startzeitenCArdy.length - 1) {
-					currentPositionCA++;
-				} else {
-					startzeitenCArdy[currentPositionCA] = startzeitenKUrdy[currentPositionKU] + 99999;
+					if (currentPositionCA < startzeitenCArdy.length - 1) {
+						currentPositionCA++;
+					} else {
+						// startzeitenCArdy[currentPositionCA] =
+						// startzeitenKUrdy[currentPositionKU] + 99999;
+						CAfinished = true;
+					}
 				}
 
 			}
