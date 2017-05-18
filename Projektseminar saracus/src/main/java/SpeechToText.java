@@ -33,13 +33,12 @@ public class SpeechToText extends AudioProcessing {
 		 test2 mytest2 = new test2();
 		 SpeakerSeperation SS = new SpeakerSeperation();
 		 
-		 File audio = myC.choose();
 		 File startzeitenTXT = myC.choose();
 		 File endzeitenTXT = myC.choose();
 		 double[] startzeiten = SS.TextToTime(startzeitenTXT);
 		 double[] endzeiten = SS.TextToTime(endzeitenTXT);
 		
-		 mytest2.cutAudio(audio, startzeiten, endzeiten);
+		 mytest2.cutAudio(startzeiten, endzeiten);
 		 
 		// AudioProcessing audio= new AudioProcessing();
 		// audio.processAudio();

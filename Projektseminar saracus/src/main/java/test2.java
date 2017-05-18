@@ -1,14 +1,19 @@
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
-public class test2 {
+public class test2 extends FileChooser {
 
-	public void cutAudio(File sourceFile, double[] startzeiten, double[] endzeiten) {
+	public void cutAudio(double[] startzeiten, double[] endzeiten) {
 
+		File sourceFile = choose();
 		String sourceFilePath = sourceFile.getPath().toString();
 		String destinationFilePath = sourceFilePath;
 		AudioInputStream inputStream = null;
@@ -56,7 +61,7 @@ public class test2 {
 			String origdestinationFilePath = destinationFilePath;
 
 			for (int i = 1; i <= AnzahlSchnitte; i++) {
-				
+
 				inputStream.skip(längeSkipsBytes[i - 1]);
 				// getFrameRate liefert float zurück, daher cast in l.54.
 				// AudioInputStream erwartet long, daher cast und +1 zum
@@ -87,9 +92,7 @@ public class test2 {
 				AudioSystem.write(shortenedStream, fileFormat.getType(), destinationFile);
 
 				// nach letztem Gesprächsanteil muss nicht mehr geskippt werden
-				
-					
-				
+
 			}
 
 		} catch (Exception e) {
@@ -110,6 +113,23 @@ public class test2 {
 		}
 		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 		// funktioniert noch nicht
-		sourceFile.delete();
+		// File sourceFile2 = new File(sourceFile.getPath().toString());
+		System.out.println(sourceFile.toString());
+		
+
+		try {
+			Files.delete(sourceFile.toPath());
+		} catch (NoSuchFileException x) {
+			System.err.format("%s: no such" + " file or directory%n", sourceFile.toPath());
+		} catch (DirectoryNotEmptyException x) {
+			System.err.format("%s not empty%n", sourceFile.toPath());
+		} catch (IOException x) {
+			// File permission problems are caught here.
+			System.err.println(x);
+		}
+		// boolean check = sourceFile.delete();
+		// System.out.println(check);
+
 	}
+
 }
