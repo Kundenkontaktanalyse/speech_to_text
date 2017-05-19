@@ -7,30 +7,15 @@ import java.io.IOException;
 public class SpeechToText extends AudioProcessing {
 	public static void main(String... args) throws Exception {
 
-		manageJavaInput MyManage = new manageJavaInput();
-		MyManage.manage();
+//		manageJavaInput MyManage = new manageJavaInput();
+//		MyManage.manage();
 		
 		
-//		ffmpegClass myffmpegClass = new ffmpegClass();
-//		myffmpegClass.audioToMetaData();
 
-		// -----------------------------------------------------------------------------------
-
-//		File caStarttimes = new File("C:\\Users\\d_tham01\\Desktop\\C1.txt");
-//		File kunStarttimes = new File("C:\\Users\\d_tham01\\Desktop\\K1.txt");
-//		File caEndttimes = new File("C:\\Users\\d_tham01\\Desktop\\C2.txt");
-//		File kunEndttimes = new File("C:\\Users\\d_tham01\\Desktop\\K2.txt");
-//
-//		TimesCut myTimesCut = new TimesCut();
-//
-//		myTimesCut.identifyStartTimes(caStarttimes);
-//		myTimesCut.identifyEndTimes(caEndttimes);
-//		myTimesCut.identifyStartTimes(kunStarttimes);
-//		myTimesCut.identifyEndTimes(kunEndttimes);
-		// ----------------------------------------------------------------------------------
-//
-//		SpeakerSeperation spsep = new SpeakerSeperation();
-//		spsep.processFiles();
+		SpeakerSeperation spsep = new SpeakerSeperation();
+		spsep.processFiles();
+		
+		
 
 		
 //		 FileChooser myC = new FileChooser();

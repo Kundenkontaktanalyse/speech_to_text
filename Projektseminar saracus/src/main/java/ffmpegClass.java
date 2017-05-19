@@ -3,28 +3,19 @@ import java.io.IOException;
 
 public class ffmpegClass extends FileChooser {
 
-	
-
-
-	
 	String settingsFfmpeg = " -af silencedetect=noise=-50dB:d=1 -f null -";
-	
-	
 
-	
-	
-	public void audioToMetaData(String inputFileCA, String inputFileKun, File caOut, File kunOut, String ffmpegPfadCMD)  {
+	public void audioToMetaData(String inputFileCA, String inputFileKun, File caOut, File kunOut,
+			String ffmpegPfadCMD) {
 		// Prozessinstanz für ffmpeg
 		ProcessBuilder ffmpeg = new ProcessBuilder(
 
 				// CMD ausführen
 				"cmd.exe", "/c",
 				// Command Line Einträge
-				ffmpegPfadCMD + "&&" + "ffmpeg -i " + inputFileCA + settingsFfmpeg + " 2> " + caOut.toString() 
-				+ " &&" + ffmpegPfadCMD
-				+ "&&" + "ffmpeg -i " + inputFileKun + settingsFfmpeg + " 2> " + kunOut.toString() );
-
-	
+				ffmpegPfadCMD + "&&" + "ffmpeg -i " + inputFileCA + settingsFfmpeg + " 2> " + caOut.toString() + " &&"
+						+ ffmpegPfadCMD + "&&" + "ffmpeg -i " + inputFileKun + settingsFfmpeg + " 2> "
+						+ kunOut.toString());
 
 		// Fehlermeldung der CMD weiterleiten an JAVA
 		ffmpeg.redirectErrorStream(true);
@@ -36,9 +27,8 @@ public class ffmpegClass extends FileChooser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	
-//
+	//
 }

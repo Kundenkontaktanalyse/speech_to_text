@@ -71,7 +71,6 @@ class AudioProcessing extends FileChooser {
 		try {
 			File file = new File(sourceFilePath);
 			AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(file);
-
 			AudioFormat format = fileFormat.getFormat();
 			inputStream = AudioSystem.getAudioInputStream(file); // eine ID
 			double audioFileLength = file.length(); // get Length des inputs

@@ -36,7 +36,7 @@ public class TextBundler {
 
 		BufferedWriter out;
 		try {
-			out = new BufferedWriter(new FileWriter("C:\\Users\\d_tham01\\sciebo\\Lehre - PS KundenKontakt saracus\\Projektarbeit\\speech-to-text\\testdaten\\audio_files\\eigeneAufnahmen\\kundengespraech\\test\\gespraechsdialog.txt"));
+			out = new BufferedWriter(new FileWriter("C:\\Users\\d_tham01\\Desktop\\testordner\\gespraechsdialog.txt"));
 
 			out.write(getFinalerOutput());
 			out.close();

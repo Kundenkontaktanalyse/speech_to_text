@@ -7,11 +7,14 @@ import java.io.IOException;
 
 public class TimesCut extends FileChooser {
 
-	public void identifyStartTimes(File inputfile, File outputdestination ) throws IOException {
+	public void identifyStartTimes(File inputfile, File outputdestination) {
 
 		
 
-		BufferedReader bReader = new BufferedReader(new FileReader(inputfile));
+		BufferedReader bReader;
+		try {
+			bReader = new BufferedReader(new FileReader(inputfile));
+		
 		BufferedWriter out = new BufferedWriter(new FileWriter(outputdestination));
 
 		while (true) {
@@ -29,15 +32,22 @@ public class TimesCut extends FileChooser {
 		}
 		out.close();
 		bReader.close();
-
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 // to be tested XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-	public void identifyEndTimes(File output) throws IOException {
+	public void identifyEndTimes(File inputfile, File outputdestination) {
 
-		File file = choose();
+		
 
-		BufferedReader bReader = new BufferedReader(new FileReader(file));
-		BufferedWriter out = new BufferedWriter(new FileWriter(output));
+		BufferedReader bReader;
+		try {
+			bReader = new BufferedReader(new FileReader(inputfile));
+		
+		BufferedWriter out = new BufferedWriter(new FileWriter(outputdestination));
 
 		while (true) {
 			String Zeile = bReader.readLine();
@@ -54,7 +64,9 @@ public class TimesCut extends FileChooser {
 		}
 		out.close();
 		bReader.close();
-
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// public static void main(String[] args) {
