@@ -162,6 +162,7 @@ class AudioProcessing extends FileChooser {
 				}
 		}
 		bundler.fuegeDauerHinzu(dauerges);
+		bundler.aktualisiereListOList();
 		bundler.generiereJSON();
 		
 	}

@@ -87,8 +87,8 @@ private void speichereOutput(){
 public void generiereJSON() throws JsonIOException, IOException{
 	String id=uuid.generiereStringID();
 	String filename="Gespräch"+id+".json";
-	aktualisiereListOList();
-	System.out.println(konfidenzListeOutput);
+	
+	//System.out.println(konfidenzListenListe.getFirst().toString());
 
 	
 	//System.out.println(konfidenzListeOutput);

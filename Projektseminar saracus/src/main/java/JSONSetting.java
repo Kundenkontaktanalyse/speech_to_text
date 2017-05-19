@@ -1,18 +1,30 @@
 
 import java.util.LinkedList;
-import java.util.List;
+import com.google.gson.annotations.Expose;
 
 public class JSONSetting {
 	
 	
-	private String id;
-	private String transkription;
+@Expose	private String id;
+@Expose	private String transkription;
 	//private double laenge;
-	private float konfidenzDurchschnitt;
-	private LinkedList<LinkedList<Float>> konfidenzListe= new LinkedList<LinkedList<Float>>();
-	private LinkedList<Double> laengenListe= new LinkedList<Double>();
+//@Expose	private float konfidenzDurchschnitt;
+@Expose	private LinkedList<LinkedList<Float>> konfidenzListe= new LinkedList<LinkedList<Float>>();
+@Expose	private LinkedList<Double> laengenListe= new LinkedList<Double>();
 	
 	
+	
+
+
+	public LinkedList<Double> getLaengenListe() {
+		return laengenListe;
+	}
+
+
+
+	public void setLaengenListe(LinkedList<Double> laengenListe) {
+		this.laengenListe = laengenListe;
+	}
 
 
 	public JSONSetting(String id, String transkription, LinkedList<Double> laengenListe , LinkedList<LinkedList<Float>> konfidenzListe ){
@@ -21,24 +33,50 @@ public class JSONSetting {
 	//	this.laenge=Math.round(sekUndMin(laenge)*10000)/10000.0;
 		this.id=id;
 		this.transkription=transkription;
-//		durchschnittsKonfidenzErmitteln();
+		durchschnittsKonfidenzErmitteln();
+	//	System.out.println(getKonfidenzListe().getFirst().toString());
 	}
 	
 
 	
-//	private void durchschnittsKonfidenzErmitteln(){
-//		LinkedList<Float> temp= new LinkedList<Float>();
-//		temp=(LinkedList<Float>) getKonfidenzListe().clone();
-//		int i=getKonfidenzListe().size();
-//		
-//		float summe=0;
-//	while(!temp.isEmpty()){
-//		Float b=temp.remove();
-//		summe=summe+b;
-//	}
-//	setKonfidenzDurchschnitt(summe/i);
-//		
-//	}
+	private void durchschnittsKonfidenzErmitteln(){		
+		LinkedList<LinkedList<Float>> temp= new LinkedList<LinkedList<Float>>();
+	    LinkedList<Float> durchschnittsListe= new LinkedList<Float>();
+		temp= kopiereListe();
+//		System.out.println("Test:" +getKonfidenzListe().get(0).get(0));
+//		System.out.println(temp);
+		float summe=0;
+	while(!temp.isEmpty()){
+		//System.out.println(getKonfidenzListe().getFirst().toString());
+		int i=temp.getFirst().size();
+		while(!temp.getFirst().isEmpty()){
+			summe=summe+temp.getFirst().getFirst();
+			temp.getFirst().remove();
+		}
+		summe=summe/i;
+		durchschnittsListe.addLast(summe);
+		temp.remove();
+	}
+	getKonfidenzListe().addLast(durchschnittsListe);
+	System.out.println(getKonfidenzListe().size());
+	//System.out.println(getKonfidenzListe().getFirst().toString());
+	
+	}
+	
+	public LinkedList <LinkedList<Float>> kopiereListe(){
+		LinkedList<LinkedList<Float>> temp= new LinkedList<LinkedList<Float>>();
+		
+		for (int i=0;i<getKonfidenzListe().size(); i++){
+			
+			temp.addLast(null);
+			for (int j=0; j<getKonfidenzListe().get(i).size();j++){
+				temp.get(i).addLast(getKonfidenzListe().get(i).get(j));
+			}
+		}
+		System.out.println(temp.toString());
+	return 	temp;
+	}
+	
 	public String getTranskription() {
 		return transkription;
 	}
@@ -60,13 +98,13 @@ public class JSONSetting {
 //		this.laenge = laenge;
 //	}
 
-	public float getKonfidenzDurchschnitt() {
-		return konfidenzDurchschnitt;
-	}
-
-	public void setKonfidenzDurchschnitt(float konfidenzDurchschnitt) {
-		this.konfidenzDurchschnitt = konfidenzDurchschnitt;
-	}
+//	public float getKonfidenzDurchschnitt() {
+//		return konfidenzDurchschnitt;
+//	}
+//
+//	public void setKonfidenzDurchschnitt(float konfidenzDurchschnitt) {
+//		this.konfidenzDurchschnitt = konfidenzDurchschnitt;
+//	}
 
 	public LinkedList<LinkedList<Float>> getKonfidenzListe() {
 		return konfidenzListe;
