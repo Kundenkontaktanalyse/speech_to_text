@@ -7,40 +7,38 @@ public class JSONSetting {
 	
 	private String id;
 	private String transkription;
-	private double laenge;
+	//private double laenge;
 	private float konfidenzDurchschnitt;
-	private LinkedList<Float> konfidenzListe= new LinkedList<Float>();
+	private LinkedList<LinkedList<Float>> konfidenzListe= new LinkedList<LinkedList<Float>>();
+	private LinkedList<Double> laengenListe= new LinkedList<Double>();
 	
 	
 
 
-	public JSONSetting(String id, String transkription, double laenge, LinkedList<Float> konfidenzListe ){
+	public JSONSetting(String id, String transkription, LinkedList<Double> laengenListe , LinkedList<LinkedList<Float>> konfidenzListe ){
 		this.konfidenzListe=konfidenzListe;
-		this.laenge=Math.round(sekInMin(laenge)*10000)/10000.0;
+		this.laengenListe=laengenListe;
+	//	this.laenge=Math.round(sekUndMin(laenge)*10000)/10000.0;
 		this.id=id;
 		this.transkription=transkription;
-		durchschnittsKonfidenzErmitteln();
+//		durchschnittsKonfidenzErmitteln();
 	}
 	
-private double sekInMin(double sek){
-	double sekTemp=(sek%60.0)*0.01;
-	int sekMin=(int)sek/60;
-	return (sekTemp+sekMin);
-}
+
 	
-	private void durchschnittsKonfidenzErmitteln(){
-		LinkedList<Float> temp= new LinkedList<Float>();
-		temp=(LinkedList<Float>) getKonfidenzListe().clone();
-		int i=getKonfidenzListe().size();
-		
-		float summe=0;
-	while(!temp.isEmpty()){
-		Float b=temp.remove();
-		summe=summe+b;
-	}
-	setKonfidenzDurchschnitt(summe/i);
-		
-	}
+//	private void durchschnittsKonfidenzErmitteln(){
+//		LinkedList<Float> temp= new LinkedList<Float>();
+//		temp=(LinkedList<Float>) getKonfidenzListe().clone();
+//		int i=getKonfidenzListe().size();
+//		
+//		float summe=0;
+//	while(!temp.isEmpty()){
+//		Float b=temp.remove();
+//		summe=summe+b;
+//	}
+//	setKonfidenzDurchschnitt(summe/i);
+//		
+//	}
 	public String getTranskription() {
 		return transkription;
 	}
@@ -54,13 +52,13 @@ private double sekInMin(double sek){
 		this.id = id;
 	}
 
-	public double getLaenge() {
-		return laenge;
-	}
-
-	public void setLaenge(double laenge) {
-		this.laenge = laenge;
-	}
+//	public double getLaenge() {
+//		return laenge;
+//	}
+//
+//	public void setLaenge(double laenge) {
+//		this.laenge = laenge;
+//	}
 
 	public float getKonfidenzDurchschnitt() {
 		return konfidenzDurchschnitt;
@@ -70,11 +68,11 @@ private double sekInMin(double sek){
 		this.konfidenzDurchschnitt = konfidenzDurchschnitt;
 	}
 
-	public LinkedList<Float> getKonfidenzListe() {
+	public LinkedList<LinkedList<Float>> getKonfidenzListe() {
 		return konfidenzListe;
 	}
 
-	public void setKonfidenzListe(LinkedList<Float> konfidenzListe) {
+	public void setKonfidenzListe(LinkedList<LinkedList<Float>> konfidenzListe) {
 		this.konfidenzListe = konfidenzListe;
 	}
 	

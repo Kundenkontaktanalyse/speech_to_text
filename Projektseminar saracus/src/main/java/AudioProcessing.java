@@ -29,7 +29,7 @@ import com.google.protobuf.ByteString;
 class AudioProcessing extends FileChooser {	
 	TextBundler bundler= new TextBundler();
 	int sampleRate;
-	double dauer;
+	double dauerges;
 
 	
 	
@@ -69,7 +69,7 @@ class AudioProcessing extends FileChooser {
 		    List<SpeechRecognitionAlternative> alternatives = result.getAlternativesList();
 		    for (SpeechRecognitionAlternative alternative: alternatives) {
 		     // System.out.printf("Transcription: %s%n", alternative.getTranscript());
-		      bundler.addTextSync(alternative.getTranscript(), alternative.getConfidence(), dauer);
+		      bundler.addTextSync(alternative.getTranscript(), alternative.getConfidence());
 		      System.out.println(alternative.getConfidence());
 		    }
 		  }
@@ -92,7 +92,7 @@ class AudioProcessing extends FileChooser {
 			double audioFileLength = file.length(); // get Length des inputs
 			inputStream = AudioSystem.getAudioInputStream(file);
 			sampleRate=(int) format.getSampleRate();
-			dauer=(inputStream.getFrameLength()/format.getFrameRate());
+			dauerges=(inputStream.getFrameLength()/format.getFrameRate());
 			
 			
 			
@@ -161,7 +161,9 @@ class AudioProcessing extends FileChooser {
 					System.out.println(e);
 				}
 		}
+		bundler.fuegeDauerHinzu(dauerges);
 		bundler.generiereJSON();
+		
 	}
 	
 	

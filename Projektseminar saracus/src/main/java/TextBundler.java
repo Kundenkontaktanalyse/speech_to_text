@@ -9,7 +9,8 @@ public class TextBundler {
 	 private double dauer;
 	 private String konfidenzListeOutput;
 	 LinkedList<Float> konfidenzListe=new LinkedList<Float>();
-	 LinkedList<Double> dauerListe=new LinkedList<Double>();	 
+	 LinkedList<Double> dauerListe=new LinkedList<Double>();	
+	 LinkedList <LinkedList<Float>> konfidenzListenListe= new  LinkedList <LinkedList<Float>>();
 	 Gson gson= new GsonBuilder().create();
 	 GenerateUUID uuid=new GenerateUUID();
 	 
@@ -25,12 +26,17 @@ public void setKonfidenz(float konfidenz){
 	this.konfidenz=konfidenz;
 }
 
-public void addTextSync(String a, float k, double d){
+private double sekUndMin(double sek){
+	double sekTemp=(sek%60.0)*0.01;
+	int sekMin=(int)sek/60;
+	return (sekTemp+sekMin);
+}
+
+public void addTextSync(String a, float k){
 	konfidenzListe.add(k);
 	
 if(getFinalerOutput()==null){ setFinalerOutput(a);
 //dauerListe.add(d);
-setDauer(d);
 }
 else{setFinalerOutput(getFinalerOutput()+" "+a);}
 //System.out.printf(getFinalerOutput());
@@ -46,12 +52,19 @@ public void setDauer(double dauer) {
 public float getKonfidenz() {
 	return konfidenz;
 }
+
+public void fuegeDauerHinzu(double dauer){
+	dauerListe.add(Math.round(sekUndMin(dauer)*10000)/10000.0);
+}
+
+public void aktualisiereListOList(){
+	konfidenzListenListe.add(konfidenzListe);
+}
+
 public void addTextAsync(String a) throws JsonIOException, IOException{
 	setFinalerOutput(a);
 	
-	speichereOutput();
-	generiereJSON();
-	
+	speichereOutput();	
 }
 
 private void speichereOutput(){
@@ -74,12 +87,12 @@ private void speichereOutput(){
 public void generiereJSON() throws JsonIOException, IOException{
 	String id=uuid.generiereStringID();
 	String filename="Gespräch"+id+".json";
-	
+	aktualisiereListOList();
 	System.out.println(konfidenzListeOutput);
 
 	
 	//System.out.println(konfidenzListeOutput);
-	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauer, konfidenzListe);
+	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauerListe, konfidenzListenListe);
 	String json=gson.toJson(jsonSettings);
 
 	
