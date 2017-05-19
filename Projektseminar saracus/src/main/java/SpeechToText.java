@@ -7,38 +7,42 @@ import java.io.IOException;
 public class SpeechToText extends AudioProcessing {
 	public static void main(String... args) throws Exception {
 
-//		File caOut = new File("C:\\Users\\Daniel\\Desktop\\Meeting\\caOut.txt");
-//		File kunOut = new File("C:\\Users\\Daniel\\Desktop\\Meeting\\kunOut.txt");
+		manageJavaInput MyManage = new manageJavaInput();
+		MyManage.manage();
+		
+		
 //		ffmpegClass myffmpegClass = new ffmpegClass();
-//		myffmpegClass.pBuild(caOut, kunOut);
+//		myffmpegClass.audioToMetaData();
 
 		// -----------------------------------------------------------------------------------
 
-//		File catimes = new File("C:\\Users\\Daniel\\Desktop\\Meeting\\GeschnitteneAudios\\catimes.txt");
-//		File kuntimes = new File("C:\\Users\\Daniel\\Desktop\\Meeting\\GeschnitteneAudios\\kuntimes.txt");
+//		File caStarttimes = new File("C:\\Users\\d_tham01\\Desktop\\C1.txt");
+//		File kunStarttimes = new File("C:\\Users\\d_tham01\\Desktop\\K1.txt");
+//		File caEndttimes = new File("C:\\Users\\d_tham01\\Desktop\\C2.txt");
+//		File kunEndttimes = new File("C:\\Users\\d_tham01\\Desktop\\K2.txt");
 //
 //		TimesCut myTimesCut = new TimesCut();
 //
-//		myTimesCut.logic(catimes);
-//
-//		myTimesCut.logic(kuntimes);
-
+//		myTimesCut.identifyStartTimes(caStarttimes);
+//		myTimesCut.identifyEndTimes(caEndttimes);
+//		myTimesCut.identifyStartTimes(kunStarttimes);
+//		myTimesCut.identifyEndTimes(kunEndttimes);
 		// ----------------------------------------------------------------------------------
 //
 //		SpeakerSeperation spsep = new SpeakerSeperation();
 //		spsep.processFiles();
 
 		
-		 FileChooser myC = new FileChooser();
-		 test2 mytest2 = new test2();
-		 SpeakerSeperation SS = new SpeakerSeperation();
-		 
-		 File startzeitenTXT = myC.choose();
-		 File endzeitenTXT = myC.choose();
-		 double[] startzeiten = SS.TextToTime(startzeitenTXT);
-		 double[] endzeiten = SS.TextToTime(endzeitenTXT);
-		
-		 mytest2.cutAudio(startzeiten, endzeiten);
+//		 FileChooser myC = new FileChooser();
+//		 test2 mytest2 = new test2();
+//		 SpeakerSeperation SS = new SpeakerSeperation();
+//		 
+//		 File startzeitenTXT = myC.choose();
+//		 File endzeitenTXT = myC.choose();
+//		 double[] startzeiten = SS.TextToTime(startzeitenTXT);
+//		 double[] endzeiten = SS.TextToTime(endzeitenTXT);
+//		
+//		 mytest2.cutAudio(startzeiten, endzeiten);
 		 
 		// AudioProcessing audio= new AudioProcessing();
 		// audio.processAudio();

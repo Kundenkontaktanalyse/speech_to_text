@@ -52,6 +52,7 @@ import javax.sound.sampled.AudioSystem;
  *  TODO:
  *  input datei beim schneiden löschen
  *  cutMethode ins gesamtsystem einbetten
+ *  identifyStarter 0.0 fixen
  *  
  */
 
@@ -65,6 +66,8 @@ public class SpeakerSeperation extends AudioProcessing {
 	File[] textfiles;
 	double[] startzeitenKU;
 	double[] startzeitenCA;
+	double[] endzeitenKU;
+	double[] endzeitenCA;
 	double[] startzeitenKUrdy;
 	double[] startzeitenCArdy;
 
@@ -302,12 +305,40 @@ public class SpeakerSeperation extends AudioProcessing {
 		return zeiten;
 	}
 
+	// to be tested XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+	public void getTimeArrays() {
+
+		for (int i = 0; i < textfiles.length; i++) {
+
+			if (textfiles[i].getName() == "C1.txt") {
+				startzeitenCA = TextToTime(textfiles[i]);
+			}
+			if (textfiles[i].getName() == "C2.txt") {
+				endzeitenCA = TextToTime(textfiles[i]);
+			}
+			if (textfiles[i].getName() == "K1.txt") {
+				startzeitenKU = TextToTime(textfiles[i]);
+			}
+			if (textfiles[i].getName() == "K2.txt") {
+				endzeitenKU = TextToTime(textfiles[i]);
+			}
+			// falls keine der if-s getriggert wurde fehler
+			if ( !(textfiles[i].getName() == "C1.txt")||(textfiles[i].getName() == "C2.txt")||(textfiles[i].getName() == "K1.txt")|| (textfiles[i].getName() == "K2.txt") ){
+				System.out.println("Fehler in Textdateibenennung");
+			}
+			
+			
+			
+			
+
+		}
+	}
+
 	// Methode liest durch getDataToArrays() die Dateien ein und generiert die
 	// StartzeitenArrays
 	public void initalizeData() {
 		getDataToArrays();
-		startzeitenCA = TextToTime(textfiles[0]);
-		startzeitenKU = TextToTime(textfiles[1]);
+		getTimeArrays(); // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 		identifyStarter();
 
 		// System.out.println(textfiles[0]);
@@ -328,6 +359,9 @@ public class SpeakerSeperation extends AudioProcessing {
 
 	// Methode zur Anpassung der double[] startzeiten: Einfügen einer 0.0 beim
 	// Beginner des Gesprächs
+	// Bei stille in beiden channeln, 0.0 einfügen kommt in falschen
+	// channel!!!!!!!!
+	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 	public void identifyStarter() {
 
 		if (startzeitenCA[0] < startzeitenKU[0]) {
@@ -353,7 +387,6 @@ public class SpeakerSeperation extends AudioProcessing {
 
 		}
 	}
-
 
 	// Methode zum Trennen der Redner:
 	// audioFiles[] wird aufgeteilt in audiofilesKU und audiofilesCA
