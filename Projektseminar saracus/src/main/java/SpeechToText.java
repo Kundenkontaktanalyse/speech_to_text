@@ -11,8 +11,8 @@ public class SpeechToText extends AudioProcessing {
 				AudioProcessing audio= new AudioProcessing();
 				try {
 					audio.processAudio();
-					audio.processAudio();
-					audio.processAudio();
+//					audio.processAudio();
+//					audio.processAudio();
 					bundler.generiereJSON();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

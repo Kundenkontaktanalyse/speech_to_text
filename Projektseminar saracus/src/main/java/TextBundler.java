@@ -1,21 +1,25 @@
 import java.io.*;
 import com.google.gson.*;
+
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 
 public class TextBundler {
 	 private String finalerOutput;
 	 private float konfidenz;
 	 private double dauer;
-	 private String konfidenzListeOutput;
 	 LinkedList<Float> konfidenzListe=new LinkedList<Float>();
 	 LinkedList<Double> dauerListe=new LinkedList<Double>();	
 	 LinkedList <Float> konfidenzListeDurchschnitt= new  LinkedList <Float>();
 	 Gson gson= new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 	 GenerateUUID uuid=new GenerateUUID();
+	 Gson gsonIn= new Gson();
+	 JsonElement fromGson;
 	 
-
-
+	// TextBundler ()throws FileNotFoundException{};
+	 
 public String getFinalerOutput() {
 	return finalerOutput;
 }
@@ -97,23 +101,30 @@ private void speichereOutput(){
 public void generiereJSON() throws JsonIOException, IOException{
 	String id=uuid.generiereStringID();
 	String filename="Gespräch"+id+".json";
-	
 	//System.out.println(konfidenzListenListe.getFirst().toString());
-
+	try{
+		 fromGson= gsonIn.fromJson
+				 (new FileReader("C:/Users/t_diek09/Desktop/testdaten/JsonInputs/JSONinput1.json"), JsonElement.class);	
+	}catch (FileNotFoundException e){
+		e.printStackTrace();}
 	
 	//System.out.println(konfidenzListeOutput);
-	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauerListe, konfidenzListeDurchschnitt);
+	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauerListe, konfidenzListeDurchschnitt, fromGson);
 	String json=gson.toJson(jsonSettings);
-
+	String jsonInTeast=fromGson.toString();
+	System.out.println(jsonInTeast);
 	
 	try{ 
 	FileWriter writer = new FileWriter("C:/Users/t_diek09/Desktop/testdaten/"+filename);
 	writer.write(json);
 	writer.close();
+	
+	
 	}catch(IOException e){
 		e.printStackTrace();
 	}
 	System.out.println(json);
+
 	
 }
 

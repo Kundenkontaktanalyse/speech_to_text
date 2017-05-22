@@ -2,6 +2,8 @@
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
+
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.Expose;
 
 public class JSONSetting {
@@ -12,9 +14,10 @@ public class JSONSetting {
 	//private double laenge;
 //@Expose	private float konfidenzDurchschnitt;
 private Date date=new Date();
-@Expose private String zeitstempel;
+@Expose private String transkriptZeitpunkt;
 @Expose	private LinkedList<Float> konfidenzListe= new LinkedList<Float>();
 @Expose	private LinkedList<Double> laengenListe= new LinkedList<Double>();
+@Expose private JsonElement initialDaten;
 	
 	
 	
@@ -31,11 +34,12 @@ private Date date=new Date();
 	}
 
 
-	public JSONSetting(String id, String transkription, LinkedList<Double> laengenListe , LinkedList<Float> konfidenzListe ){
+	public JSONSetting(String id, String transkription, LinkedList<Double> laengenListe , LinkedList<Float> konfidenzListe, JsonElement intialDaten ){
 		this.konfidenzListe=konfidenzListe;
+		this.initialDaten=intialDaten;
 		this.laengenListe=laengenListe;
 		SimpleDateFormat sdf=new SimpleDateFormat("dd.MM.YYYY hh:mm:ss");
-		this.zeitstempel=sdf.format(date);
+		this.transkriptZeitpunkt=sdf.format(date);
 	//	this.laenge=Math.round(sekUndMin(laenge)*10000)/10000.0;
 		this.id=id;
 		this.transkription=transkription;
