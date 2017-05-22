@@ -88,20 +88,31 @@ public class SpeakerSeperation extends AudioProcessing {
 		AudioInputStream shortenedStream = null;
 		int AnzahlSchnitte = startzeiten.length;
 
+		
+//	
+		
+		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+		// provisorischer Abschnitt zum einfügen der letzten Endzeit, funktioniert bisher nicht
+		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+		
 		AudioFileFormat fileFormatFuerLaenge = null;
 		try {
 			fileFormatFuerLaenge = AudioSystem.getAudioFileFormat(sourceFile);
 		} catch (UnsupportedAudioFileException | IOException e1) {
 			e1.printStackTrace();
 		}
+		
 		AudioFormat formatFuerLaenge = fileFormatFuerLaenge.getFormat();
 		double audioFileLength = sourceFile.length(); // get Length des inputs
 
 		int bytesPerSecondFuerLaenge = formatFuerLaenge.getFrameSize() * (int) formatFuerLaenge.getFrameRate(); // hz*bytes/frames
 		double audioSekunden = audioFileLength / bytesPerSecondFuerLaenge;
 
-		double[] endzeitenrdy = null;
+		double[] endzeitenrdy = endzeiten;
 
+		
+		
+		
 		if (startzeiten.length != endzeiten.length) {
 			System.out.println("Fehler bei Start/Endzeiten");
 			if (startzeiten.length > endzeiten.length) {
@@ -116,6 +127,9 @@ public class SpeakerSeperation extends AudioProcessing {
 		} else {
 			endzeitenrdy = endzeiten;
 		}
+		
+		
+		
 		// Ermittlung der Länge der Einzelnen Gesprächsabschnitte und
 		// Gesprächspausen
 		double[] längeSchnitteSekunden = new double[startzeiten.length];
@@ -386,7 +400,7 @@ public class SpeakerSeperation extends AudioProcessing {
 	}
 
 	// Methode zur Anpassung der double[] startzeiten: Einfügen einer 0.0 beim
-	// Beginner des Gesprächs
+	// Beginner des Gesprächs, wenn channel mit silence beginnt bisher negative zahl -> rausschneiden
 	public void prepareTimes() {
 
 		// 3 fehler bei ffmpeg am Anfang oder Ende:
@@ -402,30 +416,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		// 
 		// TODO überlegen fehler bei Anfang UND Ende
 
-		// ffmpeg-fehler beim CA: Gespräch beginnt sofort und erste Startzeit
-		// fehlt
-		if (startzeitenCA.length < endzeitenCA.length) {
-			startzeitenCArdy = new double[startzeitenCA.length + 1];
-			startzeitenCArdy[0] = 0.0;
-			for (int i = 1; i < startzeitenCArdy.length; i++) {
-				startzeitenCArdy[i] = startzeitenCA[i - 1];
-
-			}
-		} else {
-			startzeitenCArdy = startzeitenCA;
-		}
-		// ffmpeg-fehler beim KU: Gespräch beginnt sofort und erste Startzeit
-		// fehlt
-		if (startzeitenKU.length < endzeitenKU.length) {
-			startzeitenKUrdy = new double[startzeitenKU.length + 1];
-			startzeitenKUrdy[0] = 0.0;
-			for (int i = 1; i < startzeitenKUrdy.length; i++) {
-				startzeitenKUrdy[i] = startzeitenKU[i - 1];
-
-			}
-		} else {
-			startzeitenKUrdy = startzeitenKU;
-		}
+		
 		// negative Zeit rausschneiden
 		if (endzeitenCA[0] < 0.0) {
 			endzeitenCArdy = new double[endzeitenCA.length - 1];
@@ -446,6 +437,36 @@ public class SpeakerSeperation extends AudioProcessing {
 		} else {
 			endzeitenKUrdy = endzeitenKU;
 		}
+		
+		
+		// ffmpeg-fehler beim CA: Gespräch beginnt sofort und erste Startzeit
+		// fehlt
+		if (startzeitenCA[0] > endzeitenCA[0]) {
+			startzeitenCArdy = new double[startzeitenCA.length + 1];
+			startzeitenCArdy[0] = 0.0;
+			for (int i = 1; i < startzeitenCArdy.length; i++) {
+				startzeitenCArdy[i] = startzeitenCA[i - 1];
+
+			}
+			System.out.println("anfangsnull wude eingefügt");
+		} else {
+			startzeitenCArdy = startzeitenCA;
+		}
+		// ffmpeg-fehler beim KU: Gespräch beginnt sofort und erste Startzeit
+		// fehlt
+		if (startzeitenKU[0] > endzeitenKU[0]) {
+			startzeitenKUrdy = new double[startzeitenKU.length + 1];
+			startzeitenKUrdy[0] = 0.0;
+			for (int i = 1; i < startzeitenKUrdy.length; i++) {
+				startzeitenKUrdy[i] = startzeitenKU[i - 1];
+
+			}
+			System.out.println("anfangsnull wude eingefügt");
+
+		} else {
+			startzeitenKUrdy = startzeitenKU;
+		}
+	
 
 	}
 
@@ -474,7 +495,7 @@ public class SpeakerSeperation extends AudioProcessing {
 					audiofilesCA[insertIntoCA] = audiofiles[i];
 					insertIntoCA++;
 				} else {
-					System.out.println("Fehler bei splitSpeaker");
+					System.out.println("Audiodatei in unerkanntem Format");
 				}
 			}
 		}
@@ -530,7 +551,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		boolean KUfinished = false;
 		boolean CAfinished = false;
 
-		for (int i = 0; i < audiofiles.length; i++) {
+		for (int i = 0; i < (audiofilesKU.length + audiofilesCA.length); i++) {
 			if ((startzeitenKUrdy[currentPositionKU] < startzeitenCArdy[currentPositionCA]) || (CAfinished)) {
 				bundler.addTextSync("\n Kunde:  " + currentPositionKU);
 				processAudio(audiofilesKU[currentPositionKU]);
@@ -538,9 +559,9 @@ public class SpeakerSeperation extends AudioProcessing {
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
 					currentPositionKU++;
 				} else {
-					// startzeitenKUrdy[currentPositionKU] =
-					// startzeitenCArdy[currentPositionCA] + 99999;
-					KUfinished = true;
+					 startzeitenKUrdy[currentPositionKU] =
+					 startzeitenCArdy[currentPositionCA] + 99999;
+//					KUfinished = true;
 				}
 			} else {
 				if ((startzeitenCArdy[currentPositionCA] < startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
@@ -550,9 +571,9 @@ public class SpeakerSeperation extends AudioProcessing {
 					if (currentPositionCA < startzeitenCArdy.length - 1) {
 						currentPositionCA++;
 					} else {
-						// startzeitenCArdy[currentPositionCA] =
-						// startzeitenKUrdy[currentPositionKU] + 99999;
-						CAfinished = true;
+						 startzeitenCArdy[currentPositionCA] =
+						 startzeitenKUrdy[currentPositionKU] + 99999;
+//						CAfinished = true;
 					}
 				}
 
