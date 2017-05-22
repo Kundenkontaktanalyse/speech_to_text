@@ -10,8 +10,8 @@ public class TextBundler {
 	 private String konfidenzListeOutput;
 	 LinkedList<Float> konfidenzListe=new LinkedList<Float>();
 	 LinkedList<Double> dauerListe=new LinkedList<Double>();	
-	 LinkedList <LinkedList<Float>> konfidenzListenListe= new  LinkedList <LinkedList<Float>>();
-	 Gson gson= new GsonBuilder().create();
+	 LinkedList <Float> konfidenzListeDurchschnitt= new  LinkedList <Float>();
+	 Gson gson= new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 	 GenerateUUID uuid=new GenerateUUID();
 	 
 
@@ -30,6 +30,20 @@ private double sekUndMin(double sek){
 	double sekTemp=(sek%60.0)*0.01;
 	int sekMin=(int)sek/60;
 	return (sekTemp+sekMin);
+}
+
+public void konfidenzDurschnittErmitteln(){
+	float summe=0;
+	while(!konfidenzListe.isEmpty()){
+		//System.out.println(getKonfidenzListe().getFirst().toString());
+		int i=konfidenzListe.size();
+		while(!konfidenzListe.isEmpty()){
+			summe=summe+konfidenzListe.getFirst();
+			konfidenzListe.remove();
+		}
+		summe=summe/i;
+	}
+	 konfidenzListeDurchschnitt.add(summe);
 }
 
 public void addTextSync(String a, float k){
@@ -55,10 +69,6 @@ public float getKonfidenz() {
 
 public void fuegeDauerHinzu(double dauer){
 	dauerListe.add(Math.round(sekUndMin(dauer)*10000)/10000.0);
-}
-
-public void aktualisiereListOList(){
-	konfidenzListenListe.add(konfidenzListe);
 }
 
 public void addTextAsync(String a) throws JsonIOException, IOException{
@@ -92,7 +102,7 @@ public void generiereJSON() throws JsonIOException, IOException{
 
 	
 	//System.out.println(konfidenzListeOutput);
-	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauerListe, konfidenzListenListe);
+	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutput(), dauerListe, konfidenzListeDurchschnitt);
 	String json=gson.toJson(jsonSettings);
 
 	

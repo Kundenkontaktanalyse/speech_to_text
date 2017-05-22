@@ -27,7 +27,7 @@ import com.google.protobuf.ByteString;
 
 
 class AudioProcessing extends FileChooser {	
-	TextBundler bundler= new TextBundler();
+	static TextBundler bundler= new TextBundler();
 	int sampleRate;
 	double dauerges;
 
@@ -161,9 +161,9 @@ class AudioProcessing extends FileChooser {
 					System.out.println(e);
 				}
 		}
+		bundler.konfidenzDurschnittErmitteln();
 		bundler.fuegeDauerHinzu(dauerges);
-		bundler.aktualisiereListOList();
-		bundler.generiereJSON();
+//		bundler.generiereJSON();
 		
 	}
 	
