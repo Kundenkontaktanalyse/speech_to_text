@@ -49,4 +49,11 @@ public class AsyncProcess {
 		  speech.close();
 		}	
 	
+//	main aufruf:
+	// AudioProcessing audio= new AudioProcessing();
+			// audio.processAudio();
+			// AsyncProcess process= new AsyncProcess();
+			// process.asyncRecognizeGcs("gs://audio_projektseminar/TestDateien/channel1.wav");
+	
+	
 }

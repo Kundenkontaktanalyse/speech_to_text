@@ -32,11 +32,11 @@ public class TextBundler {
 		// speichereOutput();
 	}
 
-	public void speichereOutput() {
+	public void speichereOutput(String speicherdestination) {
 
 		BufferedWriter out;
 		try {
-			out = new BufferedWriter(new FileWriter("C:\\Users\\d_tham01\\Desktop\\testordner\\gespraechsdialog.txt"));
+			out = new BufferedWriter(new FileWriter(speicherdestination + "\\gespraechsdialog.txt"));
 
 			out.write(getFinalerOutput());
 			out.close();

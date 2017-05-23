@@ -7,32 +7,21 @@ import java.io.IOException;
 public class SpeechToText extends AudioProcessing {
 	public static void main(String... args) throws Exception {
 
-//		manageJavaInput MyManage = new manageJavaInput();
-//		MyManage.manage();
+		FileChooser myChooser = new FileChooser();
+
+		// Ort der ffmpegEXE und der beiden Audio Channels
+		String fmmpegExeOrdner = myChooser.choose().getParent();
+
 		
-		
+// ----------------------------------------------------------------
+
+		// manageJavaInput MyManage = new manageJavaInput();
+		// MyManage.manage(fmmpegExeOrdner);
+
+// ----------------------------------------------------------------
 
 		SpeakerSeperation spsep = new SpeakerSeperation();
-		spsep.processFiles();
-		
-		
-
-		
-//		 FileChooser myC = new FileChooser();
-//		 test2 mytest2 = new test2();
-//		 SpeakerSeperation SS = new SpeakerSeperation();
-//		 
-//		 File startzeitenTXT = myC.choose();
-//		 File endzeitenTXT = myC.choose();
-//		 double[] startzeiten = SS.TextToTime(startzeitenTXT);
-//		 double[] endzeiten = SS.TextToTime(endzeitenTXT);
-//		
-//		 mytest2.cutAudio(startzeiten, endzeiten);
-		 
-		// AudioProcessing audio= new AudioProcessing();
-		// audio.processAudio();
-		// AsyncProcess process= new AsyncProcess();
-		// process.asyncRecognizeGcs("gs://audio_projektseminar/TestDateien/channel1.wav");
+		spsep.processFiles(fmmpegExeOrdner);
 
 	}
 }

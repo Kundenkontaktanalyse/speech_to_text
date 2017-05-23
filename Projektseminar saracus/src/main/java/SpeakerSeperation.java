@@ -68,6 +68,7 @@ public class SpeakerSeperation extends AudioProcessing {
 	File[] audiofilesKU;
 	File[] audiofilesCA;
 	File[] textfiles;
+	// arrays zum updaten, eigentlich besser mit listen umsetzbar...
 	double[] startzeitenKU;
 	double[] startzeitenCA;
 	double[] endzeitenKU;
@@ -80,9 +81,9 @@ public class SpeakerSeperation extends AudioProcessing {
 	// Methode zum Schneiden von AudioDateien: Legt die AudioSchnitte im
 	// Verzeichnis der Audiodatei ab
 	// Bennennung der Dateien mit originalNamen + 00X für Anzahl
-	public void cutAudio(File sourceFile, double[] startzeiten, double[] endzeiten) {
+	public void cutAudio(File audioSource, double[] startzeiten, double[] endzeiten) {
 
-		String sourceFilePath = sourceFile.getPath().toString();
+		String sourceFilePath = audioSource.getPath().toString();
 		String destinationFilePath = sourceFilePath;
 		AudioInputStream inputStream = null;
 		AudioInputStream shortenedStream = null;
@@ -92,24 +93,24 @@ public class SpeakerSeperation extends AudioProcessing {
 //	
 		
 		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		// provisorischer Abschnitt zum einfügen der letzten Endzeit, funktioniert bisher nicht
+		// provisorischer Abschnitt zum einfügen der letzten Endzeit, funktionalität testen! TODO
 		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 		
 		AudioFileFormat fileFormatFuerLaenge = null;
 		try {
-			fileFormatFuerLaenge = AudioSystem.getAudioFileFormat(sourceFile);
+			fileFormatFuerLaenge = AudioSystem.getAudioFileFormat(audioSource);
 		} catch (UnsupportedAudioFileException | IOException e1) {
 			e1.printStackTrace();
 		}
 		
 		AudioFormat formatFuerLaenge = fileFormatFuerLaenge.getFormat();
-		double audioFileLength = sourceFile.length(); // get Length des inputs
+		double audioFileLength = audioSource.length(); // get Length des inputs
 
 		int bytesPerSecondFuerLaenge = formatFuerLaenge.getFrameSize() * (int) formatFuerLaenge.getFrameRate(); // hz*bytes/frames
 		double audioSekunden = audioFileLength / bytesPerSecondFuerLaenge;
 
-		double[] endzeitenrdy = endzeiten;
-
+		double[] endzeitenrdy = null;
+		// XXXXXXXXXXXXXXXXXXXXXXXXX endzeiten -> null
 		
 		
 		
@@ -123,7 +124,11 @@ public class SpeakerSeperation extends AudioProcessing {
 					endzeitenrdy[i] = endzeiten[i];
 				}
 			}
-
+			 System.out.println("endzeiten nach cut-verbesserung");
+			 for (int i = 0; i < endzeitenrdy.length; i++) {
+			 System.out.print(endzeitenrdy[i] + ", ");
+			 }
+			 System.out.println();
 		} else {
 			endzeitenrdy = endzeiten;
 		}
@@ -399,8 +404,9 @@ public class SpeakerSeperation extends AudioProcessing {
 		 System.out.println("---------------------");
 	}
 
-	// Methode zur Anpassung der double[] startzeiten: Einfügen einer 0.0 beim
-	// Beginner des Gesprächs, wenn channel mit silence beginnt bisher negative zahl -> rausschneiden
+	// Methode zur Anpassung der double[] startzeiten:
+	// 1)Einfügen einer 0.0 beim Beginner des Gesprächs
+	// 2) wenn channel mit silence beginnt bisher negative zahl -> rausschneiden
 	public void prepareTimes() {
 
 		// 3 fehler bei ffmpeg am Anfang oder Ende:
@@ -408,13 +414,15 @@ public class SpeakerSeperation extends AudioProcessing {
 		// 1) Falls gespräch sofort beginnt fehlt 0.0 als Startzeit
 		// 2) Falls gespräch ohne silence sofort endet fehlt letzte Endzeit
 		// 3) Der Channel der mit Silence beginnt erhält negative Endzeit als
-		// erste Zeit (leichter manueller FIX durch if abfrage)
-		// Lösung: Falls Anfang falsch und rest richtig: Differenz zwischen
-		// Anzahl Start- und Endzeiten -> Identifizierung und Einfügen ovn 0.0
-		// Falls Ende falsch und rest richtig: if abfrage und vergleich
+		// erste Zeit
+		// Lösung:
+		// 3)  leichtes manuelles rausschneiden durch if abfrage: endzeit[] -> endzeitrdy[])
+		// 1) Falls Anfang falsch und rest richtig: erste Starzeit liegt hinter erster endzeitrdy ->
+		//    Identifizierung und Einfügen von 0.0: startzeit[] -> startzeitrdy[]
+		// 2) Falls Ende falsch und rest richtig (durch 3 und 1 eventuelle Fehler jz behoben: if abfrage und vergleich
 		// gegen gesamtdauer des audios geschieht in cutAudio
 		// 
-		// TODO überlegen fehler bei Anfang UND Ende
+		
 
 		
 		// negative Zeit rausschneiden
@@ -424,6 +432,7 @@ public class SpeakerSeperation extends AudioProcessing {
 				endzeitenCArdy[i] = endzeitenCA[i + 1];
 
 			}
+			System.out.println("negative Endzeit beim CA geschnitten");
 		} else {
 			endzeitenCArdy = endzeitenCA;
 		}
@@ -434,6 +443,7 @@ public class SpeakerSeperation extends AudioProcessing {
 				endzeitenKUrdy[i] = endzeitenKU[i + 1];
 
 			}
+			System.out.println("negative Endzeit beim KU geschnitten");
 		} else {
 			endzeitenKUrdy = endzeitenKU;
 		}
@@ -441,27 +451,27 @@ public class SpeakerSeperation extends AudioProcessing {
 		
 		// ffmpeg-fehler beim CA: Gespräch beginnt sofort und erste Startzeit
 		// fehlt
-		if (startzeitenCA[0] > endzeitenCA[0]) {
+		if (startzeitenCA[0] > endzeitenCArdy[0]) {
 			startzeitenCArdy = new double[startzeitenCA.length + 1];
 			startzeitenCArdy[0] = 0.0;
 			for (int i = 1; i < startzeitenCArdy.length; i++) {
 				startzeitenCArdy[i] = startzeitenCA[i - 1];
 
 			}
-			System.out.println("anfangsnull wude eingefügt");
+			System.out.println("anfangsnull beim CA eingefügt");
 		} else {
 			startzeitenCArdy = startzeitenCA;
 		}
 		// ffmpeg-fehler beim KU: Gespräch beginnt sofort und erste Startzeit
 		// fehlt
-		if (startzeitenKU[0] > endzeitenKU[0]) {
+		if (startzeitenKU[0] > endzeitenKUrdy[0]) {
 			startzeitenKUrdy = new double[startzeitenKU.length + 1];
 			startzeitenKUrdy[0] = 0.0;
 			for (int i = 1; i < startzeitenKUrdy.length; i++) {
 				startzeitenKUrdy[i] = startzeitenKU[i - 1];
 
 			}
-			System.out.println("anfangsnull wude eingefügt");
+			System.out.println("anfangsnull beim KU eingefügt");
 
 		} else {
 			startzeitenKUrdy = startzeitenKU;
@@ -533,7 +543,7 @@ public class SpeakerSeperation extends AudioProcessing {
 	 * auskommentierte Syso's kontrolliert.
 	 * 
 	 */
-	public void processFiles() {
+	public void processFiles(String speicherdestination) {
 
 		initalizeData();
 
@@ -579,6 +589,6 @@ public class SpeakerSeperation extends AudioProcessing {
 
 			}
 		}
-		bundler.speichereOutput();
+		bundler.speichereOutput(speicherdestination);
 	}
 }

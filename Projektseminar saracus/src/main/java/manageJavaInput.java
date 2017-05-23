@@ -2,12 +2,9 @@ import java.io.File;
 
 public class manageJavaInput extends FileChooser {
 
-	public void manage() {
+	public void manage(String fmmpegExeOrdner) {
 
-		
-		// Identifikaiton des Prozessordners
-		
-		String fmmpegExeOrdner = choose().getParent();
+				
 
 // -------------------------------------------------------------------------------------------------------
 		
