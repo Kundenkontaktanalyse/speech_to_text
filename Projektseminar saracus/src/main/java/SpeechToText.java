@@ -15,8 +15,8 @@ public class SpeechToText extends AudioProcessing {
 		
 // ----------------------------------------------------------------
 
-		// manageJavaInput MyManage = new manageJavaInput();
-		// MyManage.manage(fmmpegExeOrdner);
+//		 manageJavaInput MyManage = new manageJavaInput();
+//		 MyManage.manage(fmmpegExeOrdner);
 
 // ----------------------------------------------------------------
 

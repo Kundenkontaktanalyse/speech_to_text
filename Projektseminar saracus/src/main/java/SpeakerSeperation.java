@@ -81,7 +81,7 @@ public class SpeakerSeperation extends AudioProcessing {
 	// Methode zum Schneiden von AudioDateien: Legt die AudioSchnitte im
 	// Verzeichnis der Audiodatei ab
 	// Bennennung der Dateien mit originalNamen + 00X für Anzahl
-	public void cutAudio(File audioSource, double[] startzeiten, double[] endzeiten) {
+	public void cutAudio(File audioSource, double[] startzeiten, double[] endzeiten, char channel) {
 
 		String sourceFilePath = audioSource.getPath().toString();
 		String destinationFilePath = sourceFilePath;
@@ -187,12 +187,12 @@ public class SpeakerSeperation extends AudioProcessing {
 
 				String insert = null;
 				if (i < 10) {
-					insert = "_00";
+					insert = channel + "_00";
 				} else {
 					if (i < 100) {
-						insert = "_0";
+						insert = channel + "_0";
 					} else {
-						insert = "_";
+						insert = channel + "_";
 					}
 
 				}
@@ -363,8 +363,8 @@ public class SpeakerSeperation extends AudioProcessing {
 		getTimeArrays();
 		prepareTimes();
 		audioChannels = getAudioFilesToArray();
-		cutAudio(audioChannels[0], startzeitenCArdy, endzeitenCArdy);
-		cutAudio(audioChannels[1], startzeitenKUrdy, endzeitenKUrdy);
+		cutAudio(audioChannels[0], startzeitenCArdy, endzeitenCArdy, 'C');
+		cutAudio(audioChannels[1], startzeitenKUrdy, endzeitenKUrdy, 'K');
 		audiofiles = getAudioFilesToArray();
 
 		splitSpeaker();
