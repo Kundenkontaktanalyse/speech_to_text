@@ -118,7 +118,7 @@ public class SpeakerSeperation extends AudioProcessing {
 			System.out.println("Fehler bei Start/Endzeiten");
 			if (startzeiten.length > endzeiten.length) {
 				System.out.println("letzte Endzeit fehlt: Wurde eingesetzt");
-				endzeitenrdy = new double[endzeiten.length +1];
+				endzeitenrdy = new double[endzeiten.length + 1];
 				endzeitenrdy[endzeitenrdy.length - 1] = audioSekunden;
 				for (int i = 0; i < endzeiten.length; i++){
 					endzeitenrdy[i] = endzeiten[i];

@@ -3,7 +3,7 @@ import java.io.IOException;
 
 public class ffmpegClass extends FileChooser {
 
-	String settingsFfmpeg = " -af silencedetect=noise=-50dB:d=1 -f null -";
+	String settingsFfmpeg = " -af silencedetect=noise=-35dB:d=1 -f null -";
 
 	public void audioToMetaData(String inputFileCA, String inputFileKun, File caOut, File kunOut,
 			String ffmpegPfadCMD) {
