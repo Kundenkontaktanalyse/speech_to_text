@@ -563,7 +563,7 @@ public class SpeakerSeperation extends AudioProcessing {
 
 		for (int i = 0; i < (audiofilesKU.length + audiofilesCA.length); i++) {
 			if ((startzeitenKUrdy[currentPositionKU] < startzeitenCArdy[currentPositionCA]) || (CAfinished)) {
-				bundler.addTextSync("\n Kunde:  " + currentPositionKU);
+				bundler.addTextSync("\n Kunde:  " + currentPositionKU, 123);
 				processAudio(audiofilesKU[currentPositionKU]);
 
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
@@ -575,7 +575,7 @@ public class SpeakerSeperation extends AudioProcessing {
 				}
 			} else {
 				if ((startzeitenCArdy[currentPositionCA] < startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
-					bundler.addTextSync("\n Agent:  " + currentPositionCA);
+					bundler.addTextSync("\n Agent:  " + currentPositionCA,123);
 					processAudio(audiofilesCA[currentPositionCA]);
 
 					if (currentPositionCA < startzeitenCArdy.length - 1) {
@@ -589,6 +589,6 @@ public class SpeakerSeperation extends AudioProcessing {
 
 			}
 		}
-		bundler.speichereOutput(speicherdestination);
+		
 	}
 }
