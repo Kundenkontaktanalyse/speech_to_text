@@ -61,7 +61,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class SpeakerSeperation extends AudioProcessing {
 
-	File sourceFile = choose();;
+	File sourceFile;
 	File ParentsourceFile;
 	File[] audioChannels;
 	File[] audiofiles;
@@ -78,6 +78,10 @@ public class SpeakerSeperation extends AudioProcessing {
 	double[] endzeitenKUrdy;
 	double[] endzeitenCArdy;
 
+	public SpeakerSeperation(File sourceFile) {
+		this.sourceFile = sourceFile;
+	}
+
 	// Methode zum Schneiden von AudioDateien: Legt die AudioSchnitte im
 	// Verzeichnis der Audiodatei ab
 	// Bennennung der Dateien mit originalNamen + 00X für Anzahl
@@ -89,20 +93,20 @@ public class SpeakerSeperation extends AudioProcessing {
 		AudioInputStream shortenedStream = null;
 		int AnzahlSchnitte = startzeiten.length;
 
-		
-//	
-		
+		//
+
 		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		// provisorischer Abschnitt zum einfügen der letzten Endzeit, funktionalität testen! TODO
+		// provisorischer Abschnitt zum einfügen der letzten Endzeit,
+		// funktionalität testen! TODO
 		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		
+
 		AudioFileFormat fileFormatFuerLaenge = null;
 		try {
 			fileFormatFuerLaenge = AudioSystem.getAudioFileFormat(audioSource);
 		} catch (UnsupportedAudioFileException | IOException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		AudioFormat formatFuerLaenge = fileFormatFuerLaenge.getFormat();
 		double audioFileLength = audioSource.length(); // get Length des inputs
 
@@ -111,30 +115,26 @@ public class SpeakerSeperation extends AudioProcessing {
 
 		double[] endzeitenrdy = null;
 		// XXXXXXXXXXXXXXXXXXXXXXXXX endzeiten -> null
-		
-		
-		
+
 		if (startzeiten.length != endzeiten.length) {
 			System.out.println("Fehler bei Start/Endzeiten");
 			if (startzeiten.length > endzeiten.length) {
 				System.out.println("letzte Endzeit fehlt: Wurde eingesetzt");
 				endzeitenrdy = new double[endzeiten.length + 1];
 				endzeitenrdy[endzeitenrdy.length - 1] = audioSekunden;
-				for (int i = 0; i < endzeiten.length; i++){
+				for (int i = 0; i < endzeiten.length; i++) {
 					endzeitenrdy[i] = endzeiten[i];
 				}
 			}
-			 System.out.println("endzeiten nach cut-verbesserung");
-			 for (int i = 0; i < endzeitenrdy.length; i++) {
-			 System.out.print(endzeitenrdy[i] + ", ");
-			 }
-			 System.out.println();
+			System.out.println("endzeiten nach cut-verbesserung");
+			for (int i = 0; i < endzeitenrdy.length; i++) {
+				System.out.print(endzeitenrdy[i] + ", ");
+			}
+			System.out.println();
 		} else {
 			endzeitenrdy = endzeiten;
 		}
-		
-		
-		
+
 		// Ermittlung der Länge der Einzelnen Gesprächsabschnitte und
 		// Gesprächspausen
 		double[] längeSchnitteSekunden = new double[startzeiten.length];
@@ -318,7 +318,6 @@ public class SpeakerSeperation extends AudioProcessing {
 		return zeiten;
 	}
 
-	
 	public void getTimeArrays() {
 
 		startzeitenCA = TextToTime(textfiles[0]);
@@ -369,39 +368,39 @@ public class SpeakerSeperation extends AudioProcessing {
 
 		splitSpeaker();
 
-		 System.out.println(textfiles[0]);
-		 System.out.println(textfiles[1]);
-		 System.out.println(textfiles[2]);
-		 System.out.println(textfiles[3]);
-		 System.out.println("---------------");
-		
-		 System.out.println("startzeitenCArdy");
-		 for (int i = 0; i < startzeitenCArdy.length; i++) {
-		 System.out.print(startzeitenCArdy[i] + ", ");
-		 }
-		 System.out.println();
-		 System.out.println("---------------------");
-		
-		 System.out.println("endzeitenCArdy");
-		 for (int i = 0; i < endzeitenCArdy.length; i++) {
-		 System.out.print(endzeitenCArdy[i] + ", ");
-		 }
-		 System.out.println();
-		 System.out.println("---------------------");
-		
-		 System.out.println("startzeitenKUrdy");
-		 for (int i = 0; i < startzeitenKUrdy.length; i++) {
-		 System.out.print(startzeitenKUrdy[i] + ", ");
-		 }
-		 System.out.println();
-		 System.out.println("---------------------");
-		
-		 System.out.println("endzeitenKUrdy");
-		 for (int i = 0; i < endzeitenKUrdy.length; i++) {
-		 System.out.print(endzeitenKUrdy[i] + ", ");
-		 }
-		 System.out.println();
-		 System.out.println("---------------------");
+		System.out.println(textfiles[0]);
+		System.out.println(textfiles[1]);
+		System.out.println(textfiles[2]);
+		System.out.println(textfiles[3]);
+		System.out.println("---------------");
+
+		System.out.println("startzeitenCArdy");
+		for (int i = 0; i < startzeitenCArdy.length; i++) {
+			System.out.print(startzeitenCArdy[i] + ", ");
+		}
+		System.out.println();
+		System.out.println("---------------------");
+
+		System.out.println("endzeitenCArdy");
+		for (int i = 0; i < endzeitenCArdy.length; i++) {
+			System.out.print(endzeitenCArdy[i] + ", ");
+		}
+		System.out.println();
+		System.out.println("---------------------");
+
+		System.out.println("startzeitenKUrdy");
+		for (int i = 0; i < startzeitenKUrdy.length; i++) {
+			System.out.print(startzeitenKUrdy[i] + ", ");
+		}
+		System.out.println();
+		System.out.println("---------------------");
+
+		System.out.println("endzeitenKUrdy");
+		for (int i = 0; i < endzeitenKUrdy.length; i++) {
+			System.out.print(endzeitenKUrdy[i] + ", ");
+		}
+		System.out.println();
+		System.out.println("---------------------");
 	}
 
 	// Methode zur Anpassung der double[] startzeiten:
@@ -416,15 +415,16 @@ public class SpeakerSeperation extends AudioProcessing {
 		// 3) Der Channel der mit Silence beginnt erhält negative Endzeit als
 		// erste Zeit
 		// Lösung:
-		// 3)  leichtes manuelles rausschneiden durch if abfrage: endzeit[] -> endzeitrdy[])
-		// 1) Falls Anfang falsch und rest richtig: erste Starzeit liegt hinter erster endzeitrdy ->
-		//    Identifizierung und Einfügen von 0.0: startzeit[] -> startzeitrdy[]
-		// 2) Falls Ende falsch und rest richtig (durch 3 und 1 eventuelle Fehler jz behoben: if abfrage und vergleich
+		// 3) leichtes manuelles rausschneiden durch if abfrage: endzeit[] ->
+		// endzeitrdy[])
+		// 1) Falls Anfang falsch und rest richtig: erste Starzeit liegt hinter
+		// erster endzeitrdy ->
+		// Identifizierung und Einfügen von 0.0: startzeit[] -> startzeitrdy[]
+		// 2) Falls Ende falsch und rest richtig (durch 3 und 1 eventuelle
+		// Fehler jz behoben: if abfrage und vergleich
 		// gegen gesamtdauer des audios geschieht in cutAudio
-		// 
-		
+		//
 
-		
 		// negative Zeit rausschneiden
 		if (endzeitenCA[0] < 0.0) {
 			endzeitenCArdy = new double[endzeitenCA.length - 1];
@@ -447,8 +447,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		} else {
 			endzeitenKUrdy = endzeitenKU;
 		}
-		
-		
+
 		// ffmpeg-fehler beim CA: Gespräch beginnt sofort und erste Startzeit
 		// fehlt
 		if (startzeitenCA[0] > endzeitenCArdy[0]) {
@@ -476,7 +475,6 @@ public class SpeakerSeperation extends AudioProcessing {
 		} else {
 			startzeitenKUrdy = startzeitenKU;
 		}
-	
 
 	}
 
@@ -569,26 +567,24 @@ public class SpeakerSeperation extends AudioProcessing {
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
 					currentPositionKU++;
 				} else {
-					 startzeitenKUrdy[currentPositionKU] =
-					 startzeitenCArdy[currentPositionCA] + 99999;
-//					KUfinished = true;
+					startzeitenKUrdy[currentPositionKU] = startzeitenCArdy[currentPositionCA] + 99999;
+					// KUfinished = true;
 				}
 			} else {
 				if ((startzeitenCArdy[currentPositionCA] < startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
-					bundler.addTextSync("\n Agent:  " + currentPositionCA,123);
+					bundler.addTextSync("\n Agent:  " + currentPositionCA, 123);
 					processAudio(audiofilesCA[currentPositionCA]);
 
 					if (currentPositionCA < startzeitenCArdy.length - 1) {
 						currentPositionCA++;
 					} else {
-						 startzeitenCArdy[currentPositionCA] =
-						 startzeitenKUrdy[currentPositionKU] + 99999;
-//						CAfinished = true;
+						startzeitenCArdy[currentPositionCA] = startzeitenKUrdy[currentPositionKU] + 99999;
+						// CAfinished = true;
 					}
 				}
 
 			}
 		}
-		
+
 	}
 }

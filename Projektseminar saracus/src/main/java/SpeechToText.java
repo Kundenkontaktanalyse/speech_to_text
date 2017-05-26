@@ -10,19 +10,21 @@ public class SpeechToText extends AudioProcessing {
 		FileChooser myChooser = new FileChooser();
 
 		// Ort der ffmpegEXE und der beiden Audio Channels
-		String fmmpegExeOrdner = myChooser.choose().getParent();
+		File sourceFile = myChooser.choose();
+		String fmmpegExeOrdner = sourceFile.getParent();
 
 		
 // ----------------------------------------------------------------
 
-//		 manageJavaInput MyManage = new manageJavaInput();
-//		 MyManage.manage(fmmpegExeOrdner);
+		 manageJavaInput MyManage = new manageJavaInput();
+		 MyManage.manage(fmmpegExeOrdner);
 
 // ----------------------------------------------------------------
 
-		SpeakerSeperation spsep = new SpeakerSeperation();
+		SpeakerSeperation spsep = new SpeakerSeperation(sourceFile);
 		spsep.processFiles(fmmpegExeOrdner);
 		bundler.generiereJSON();
+		bundler.speichereDialoginTXT(fmmpegExeOrdner);
 
 	}
 }

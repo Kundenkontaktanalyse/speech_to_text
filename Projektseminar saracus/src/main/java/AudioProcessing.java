@@ -79,7 +79,7 @@ class AudioProcessing extends FileChooser {
 		}
 	
 	
-	public void processAudio(File sourceFile) throws IOException {
+	public void processAudio(File sourceFile) {
 		
 		String sourceFilePath = sourceFile.getPath().toString();
 		String destinationFileName = sourceFilePath;

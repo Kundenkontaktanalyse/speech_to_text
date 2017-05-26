@@ -75,27 +75,30 @@ public void fuegeDauerHinzu(double dauer){
 	dauerListe.add(Math.round(sekUndMin(dauer)*10000)/10000.0);
 }
 
+
+// INAKTIV!
 public void addTextAsync(String a) throws JsonIOException, IOException{
 	setFinalerOutput(a);
 	
-	speichereOutput();	
+	// speichereDialoginTXT();	
 }
 
-private void speichereOutput(){
-	try {
-	    BufferedWriter out = new BufferedWriter(new FileWriter("test.txt"));
-	    out.write(getFinalerOutput());  //Replace with the string 
-	                                             //you are trying to write  
-	    out.close();
-	}
-	catch (IOException e)
-	{
-	    System.out.println("Exception ");
+public void speichereDialoginTXT(String speicherdestination) {
 
+	BufferedWriter out;
+	try {
+		out = new BufferedWriter(new FileWriter(speicherdestination + "\\gespraechsdialog.txt"));
+
+		out.write(getFinalerOutput());
+		out.close();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
 	}
+}
 
 	
-}
+
 
 
 public void generiereJSON() throws JsonIOException, IOException{
@@ -104,7 +107,7 @@ public void generiereJSON() throws JsonIOException, IOException{
 	//System.out.println(konfidenzListenListe.getFirst().toString());
 	try{
 		 fromGson= gsonIn.fromJson
-				 (new FileReader("C:/Users/t_diek09/Desktop/testdaten/JsonInputs/JSONinput1.json"), JsonElement.class);	
+				 (new FileReader("C:/Users/d_tham01/Desktop/JSONinputs/JSONinput1.json"), JsonElement.class);	
 	}catch (FileNotFoundException e){
 		e.printStackTrace();}
 	
@@ -115,7 +118,7 @@ public void generiereJSON() throws JsonIOException, IOException{
 	System.out.println(jsonInTeast);
 	
 	try{ 
-	FileWriter writer = new FileWriter("C:/Users/t_diek09/Desktop/testdaten/"+filename);
+	FileWriter writer = new FileWriter("C:/Users/d_tham01/Desktop/testordner/"+filename);
 	writer.write(json);
 	writer.close();
 	
