@@ -139,7 +139,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		// Gesprächspausen
 		double[] längeSchnitteSekunden = new double[startzeiten.length];
 		for (int i = 0; i < längeSchnitteSekunden.length; i++) {
-			längeSchnitteSekunden[i] = endzeitenrdy[i] - startzeiten[i];
+			längeSchnitteSekunden[i] = endzeitenrdy[i] - startzeiten[i] +1;//Extra Sekunde, um leise Satzenden mit zu tranksribieren.
 		}
 		// for (int i = 0; i < längeSchnitte.length; i++) {
 		// System.out.println(längeSchnitte[i]);
@@ -561,7 +561,7 @@ public class SpeakerSeperation extends AudioProcessing {
 
 		for (int i = 0; i < (audiofilesKU.length + audiofilesCA.length); i++) {
 			if ((startzeitenKUrdy[currentPositionKU] < startzeitenCArdy[currentPositionCA]) || (CAfinished)) {
-				bundler.addTextSync("\n Kunde:  " + currentPositionKU, 123);
+				bundler.addGespraechsStruktur("\n Kunde:  " + currentPositionKU);
 				processAudio(audiofilesKU[currentPositionKU]);
 
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
@@ -572,7 +572,7 @@ public class SpeakerSeperation extends AudioProcessing {
 				}
 			} else {
 				if ((startzeitenCArdy[currentPositionCA] < startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
-					bundler.addTextSync("\n Agent:  " + currentPositionCA, 123);
+					bundler.addGespraechsStruktur("\n Agent:  " + currentPositionCA);
 					processAudio(audiofilesCA[currentPositionCA]);
 
 					if (currentPositionCA < startzeitenCArdy.length - 1) {
