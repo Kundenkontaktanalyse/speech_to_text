@@ -22,6 +22,7 @@ public class SpeechToText extends AudioProcessing {
 
 		SpeakerSeperation spsep = new SpeakerSeperation();
 		spsep.processFiles(fmmpegExeOrdner);
+		bundler.generiereJSON();
 
 	}
 }

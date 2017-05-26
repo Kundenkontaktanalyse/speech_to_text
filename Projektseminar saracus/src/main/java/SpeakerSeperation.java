@@ -543,7 +543,7 @@ public class SpeakerSeperation extends AudioProcessing {
 	 * auskommentierte Syso's kontrolliert.
 	 * 
 	 */
-	public void processFiles(String speicherdestination) {
+	public void processFiles(String speicherdestination) throws IOException {
 
 		initalizeData();
 
