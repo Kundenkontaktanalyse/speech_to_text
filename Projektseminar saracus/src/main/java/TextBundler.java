@@ -8,10 +8,12 @@ public class TextBundler {
 	 LinkedList<Float> konfidenzListe=new LinkedList<Float>();
 	 LinkedList<Double> dauerListe=new LinkedList<Double>();	
 	 LinkedList <Float> konfidenzListeDurchschnitt= new  LinkedList <Float>();
-	 Gson gson= new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+	 Gson gson= new GsonBuilder().create();
 	 GenerateUUID uuid=new GenerateUUID();
 	 Gson gsonIn= new Gson();
-	 JsonElement fromGson;	 
+	 JsonElement fromGson;	
+	 Snippet[] snippetlist;
+	 int counter=0;
 	 
 
 private double sekUndMin(double sek){
@@ -27,7 +29,7 @@ public void addGespraechsStruktur(String s){
 		 setFinalerOutputJson(getFinalerOutputJson()+" "+s);
 	}
 }
-public void konfidenzDurschnittErmitteln(){
+public float konfidenzDurschnittErmitteln(){
 	float summe=0;
 	while(!konfidenzListe.isEmpty()){
 		//System.out.println(getKonfidenzListe().getFirst().toString());
@@ -39,6 +41,7 @@ public void konfidenzDurschnittErmitteln(){
 		summe=summe/i;
 	}
 	 konfidenzListeDurchschnitt.add(summe);
+	 return summe;
 }
 
 public void addTextSync(String a, float k){
@@ -88,8 +91,9 @@ public void generiereJSON(String fileDestination, String jsonInput) throws JsonI
 		e.printStackTrace();}
 	
 	//System.out.println(konfidenzListeOutput);
-	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutputJson(), dauerListe, konfidenzListeDurchschnitt, fromGson);
-	String json=gson.toJson(jsonSettings);
+//	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutputJson(), dauerListe, konfidenzListeDurchschnitt, fromGson);
+	JsonStructure jsonStructure=new JsonStructure(snippetlist, fromGson);
+	String json=gson.toJson(jsonStructure);
 	String jsonInTeast=fromGson.toString();
 	System.out.println(jsonInTeast);
 	
@@ -123,8 +127,42 @@ public void setFinalerOutputDialog(String finalerOutputDialog) {
 	this.finalerOutputDialog = finalerOutputDialog;
 }
 
+/**
+ * setzt das schnipselarray auf die richtige groeﬂe.
+ * @param i groeﬂe des arrays.
+ */
+public void setSnippetListSize(int i){
+	snippetlist=new Snippet[i];
+}
+
+public void addSnippet(String role, String transcript, double length, float confidence){
+	snippetlist[counter]=new Snippet(role, transcript, length, confidence);
+	counter++;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
+
+
 
 
 

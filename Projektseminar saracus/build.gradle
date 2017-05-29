@@ -33,7 +33,7 @@ dependencies {
 
 
 	//benoetigt fuer FatJar
-	compile 'ch.qos.logback:logback-classic:1.1.2'
+	//compile 'ch.qos.logback:logback-classic:1.1.2'
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:21.0'

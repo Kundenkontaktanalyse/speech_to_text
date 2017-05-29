@@ -31,7 +31,9 @@ class AudioProcessing extends FileChooser {
 	String sourceFileName;
 	int sampleRate;
 	double dauerges;
-
+	String role;
+	String transcript;
+	float confidence;
 	
 	
 	public void recognize(String fileName) throws Exception, IOException {
@@ -69,7 +71,12 @@ class AudioProcessing extends FileChooser {
 		  for (SpeechRecognitionResult result: results) {
 		    List<SpeechRecognitionAlternative> alternatives = result.getAlternativesList();
 		    for (SpeechRecognitionAlternative alternative: alternatives) {
-		     // System.out.printf("Transcription: %s%n", alternative.getTranscript());
+		    	
+		    	if(transcript==null){transcript=alternative.getTranscript();
+		    	}
+		    	else transcript=transcript+ alternative.getTranscript();
+		    	confidence=confidence+alternative.getConfidence();
+		    	System.out.println("transcript"+ transcript);
 		      bundler.addTextSync(alternative.getTranscript(), alternative.getConfidence());
 		      System.out.println(alternative.getConfidence());
 		    }
@@ -79,7 +86,7 @@ class AudioProcessing extends FileChooser {
 		}
 	
 	
-	public void processAudio(File sourceFile) {
+	public void processAudio(File sourceFile, String role) {
 		
 		String sourceFilePath = sourceFile.getPath().toString();
 		String destinationFileName = sourceFilePath;
@@ -165,6 +172,9 @@ class AudioProcessing extends FileChooser {
 		}
 		bundler.konfidenzDurschnittErmitteln();
 		bundler.fuegeDauerHinzu(dauerges);
+		System.out.println("role"+role+ " Tra:" + transcript);
+		bundler.addSnippet(this.role, transcript, dauerges, (float)Math.ceil((double)confidence/(dauerges/15)));
+		transcript=null;
 //		bundler.generiereJSON();
 		
 	}

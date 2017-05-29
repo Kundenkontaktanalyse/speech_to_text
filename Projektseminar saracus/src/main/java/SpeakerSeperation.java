@@ -139,7 +139,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		// Gesprächspausen
 		double[] längeSchnitteSekunden = new double[startzeiten.length];
 		for (int i = 0; i < längeSchnitteSekunden.length; i++) {
-			längeSchnitteSekunden[i] = endzeitenrdy[i] - startzeiten[i] +1;//Extra Sekunde, um leise Satzenden mit zu tranksribieren.
+			längeSchnitteSekunden[i] = endzeitenrdy[i] - startzeiten[i] +2;//Extra Sekunde, um leise Satzenden mit zu tranksribieren.
 		}
 		// for (int i = 0; i < längeSchnitte.length; i++) {
 		// System.out.println(längeSchnitte[i]);
@@ -148,7 +148,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		double[] längeSkipsSekunden = new double[startzeiten.length];
 		längeSkipsSekunden[0] = startzeiten[0];
 		for (int i = 1; i < längeSkipsSekunden.length; i++) {
-			längeSkipsSekunden[i] = startzeiten[i] - endzeitenrdy[i - 1];
+			längeSkipsSekunden[i] = startzeiten[i] - endzeitenrdy[i - 1]-2;
 		}
 
 		try {
@@ -173,7 +173,27 @@ public class SpeakerSeperation extends AudioProcessing {
 
 			for (int i = 1; i <= AnzahlSchnitte; i++) {
 
-				inputStream.skip(längeSkipsBytes[i - 1]);
+				// durch -2 in l.149 kann erstes Element negativ sein
+
+                if (längeSkipsBytes[i - 1] > 0){
+
+                    
+
+                    //anpassung der skip werte in l.150: bei erster Iteration nur 1 Sekunde weniger (vor erstem Audioschnitt,
+
+                    //ab dann immer 2 Sekunden (vor und nach jedem Audio)
+
+                    if (i == 1){
+
+                        inputStream.skip(längeSkipsBytes[i - 1] + 1);
+
+                    } else {
+
+                        inputStream.skip(längeSkipsBytes[i - 1]);
+
+                    }
+
+                }
 				// getFrameRate liefert float zurück, daher cast in l.54.
 				// AudioInputStream erwartet long, daher cast und +1 zum
 				// aufrunden
@@ -544,6 +564,8 @@ public class SpeakerSeperation extends AudioProcessing {
 	public void processFiles(String speicherdestination) throws IOException {
 
 		initalizeData();
+		bundler.setSnippetListSize(audiofiles.length-2);
+		System.out.println("SnippetSize:" + (audiofiles.length-2));
 
 		// Idee eines Stack:
 		// Zeiger auf jeweiligen Feldern, "abnehmen" des aktuellsten Elemts
@@ -562,7 +584,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		for (int i = 0; i < (audiofilesKU.length + audiofilesCA.length); i++) {
 			if ((startzeitenKUrdy[currentPositionKU] < startzeitenCArdy[currentPositionCA]) || (CAfinished)) {
 				bundler.addGespraechsStruktur("\n Kunde:  " + currentPositionKU);
-				processAudio(audiofilesKU[currentPositionKU]);
+				processAudio(audiofilesKU[currentPositionKU], "K: ");
 
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
 					currentPositionKU++;
@@ -573,7 +595,7 @@ public class SpeakerSeperation extends AudioProcessing {
 			} else {
 				if ((startzeitenCArdy[currentPositionCA] < startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
 					bundler.addGespraechsStruktur("\n Agent:  " + currentPositionCA);
-					processAudio(audiofilesCA[currentPositionCA]);
+					processAudio(audiofilesCA[currentPositionCA], "A: ");
 
 					if (currentPositionCA < startzeitenCArdy.length - 1) {
 						currentPositionCA++;
