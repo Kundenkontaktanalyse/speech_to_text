@@ -51,11 +51,13 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  *  
  *  
  *  TODO:
- *  - input datei beim schneiden löschen (UNNÖTIG? JA!)
- *  - cutMethode ins gesamtsystem einbetten / KONTROLLIEREN!
- *  - identifyStarter 0.0 fixen (leere sekunden einfügen vor beiden channeln) oder (??) vergleich anzahl start und endzeiten: siehe todo2
- *    falls mehr endzeiten pro channel als startzeiten -> start fehlt ABER: falls keine stille am ende des gesprächs endzeitenanzahl = -1!! (egal?)
- *  - textbundler outputdestination dynamisch machen
+ *  
+ *  - input errors abfangen
+ *  - internal errors abfangen
+ *  - ffmpeg justieren
+ *  
+ *  
+ * 
  *  
  */
 
@@ -95,11 +97,8 @@ public class SpeakerSeperation extends AudioProcessing {
 
 		//
 
-		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		// provisorischer Abschnitt zum einfügen der letzten Endzeit,
-		// funktionalität testen! TODO
-		// XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
+		
+		// Abschnitt zum einfügen der letzten Endzeit,
 		AudioFileFormat fileFormatFuerLaenge = null;
 		try {
 			fileFormatFuerLaenge = AudioSystem.getAudioFileFormat(audioSource);
@@ -114,7 +113,6 @@ public class SpeakerSeperation extends AudioProcessing {
 		double audioSekunden = audioFileLength / bytesPerSecondFuerLaenge;
 
 		double[] endzeitenrdy = null;
-		// XXXXXXXXXXXXXXXXXXXXXXXXX endzeiten -> null
 
 		if (startzeiten.length != endzeiten.length) {
 			System.out.println("Fehler bei Start/Endzeiten");
@@ -126,11 +124,11 @@ public class SpeakerSeperation extends AudioProcessing {
 					endzeitenrdy[i] = endzeiten[i];
 				}
 			}
-			System.out.println("endzeiten nach cut-verbesserung");
-			for (int i = 0; i < endzeitenrdy.length; i++) {
-				System.out.print(endzeitenrdy[i] + ", ");
-			}
-			System.out.println();
+//			System.out.println("endzeiten nach cut-verbesserung");
+//			for (int i = 0; i < endzeitenrdy.length; i++) {
+//				System.out.print(endzeitenrdy[i] + ", ");
+//			}
+//			System.out.println();
 		} else {
 			endzeitenrdy = endzeiten;
 		}
@@ -139,7 +137,8 @@ public class SpeakerSeperation extends AudioProcessing {
 		// Gesprächspausen
 		double[] längeSchnitteSekunden = new double[startzeiten.length];
 		for (int i = 0; i < längeSchnitteSekunden.length; i++) {
-			längeSchnitteSekunden[i] = endzeitenrdy[i] - startzeiten[i] +1;//Extra Sekunde, um leise Satzenden mit zu tranksribieren.
+			längeSchnitteSekunden[i] = endzeitenrdy[i] - startzeiten[i] + 2;//Extra Sekunden am Anfang und Ende,
+			 																// um leise Satzenden mit zu tranksribieren.
 		}
 		// for (int i = 0; i < längeSchnitte.length; i++) {
 		// System.out.println(längeSchnitte[i]);
@@ -148,7 +147,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		double[] längeSkipsSekunden = new double[startzeiten.length];
 		längeSkipsSekunden[0] = startzeiten[0];
 		for (int i = 1; i < längeSkipsSekunden.length; i++) {
-			längeSkipsSekunden[i] = startzeiten[i] - endzeitenrdy[i - 1];
+			längeSkipsSekunden[i] = startzeiten[i] - endzeitenrdy[i - 1] - 2; // Extra Sekunde am Ende (s.o.) und Anfang lassen
 		}
 
 		try {
@@ -173,9 +172,19 @@ public class SpeakerSeperation extends AudioProcessing {
 
 			for (int i = 1; i <= AnzahlSchnitte; i++) {
 
-				inputStream.skip(längeSkipsBytes[i - 1]);
+				// durch -2 in l.149 kann erstes Element negativ sein
+				if (längeSkipsBytes[i - 1] > 0){
+					
+					//anpassung der skip werte in l.150: bei erster Iteration nur 1 Sekunde weniger (vor erstem Audioschnitt,
+					//ab dann immer 2 Sekunden (vor und nach jedem Audio)
+					if (i == 1){
+						inputStream.skip(längeSkipsBytes[i - 1] + 1);
+					} else {
+						inputStream.skip(längeSkipsBytes[i - 1]);
+					}
+				}
 				// getFrameRate liefert float zurück, daher cast in l.54.
-				// AudioInputStream erwartet long, daher cast und +1 zum
+				// AudioInputStream erwartet long, daher cast und + 1 zum
 				// aufrunden
 				float framesOfAudioToCopy = (float) längeSchnitteSekunden[i - 1] * format.getFrameRate();
 
@@ -357,6 +366,7 @@ public class SpeakerSeperation extends AudioProcessing {
 
 	// Methode liest durch getDataToArrays() die Dateien ein und generiert die
 	// ZeitenArrays
+	// Agent-Channel muss alphabetisch über Kunden-Channel stehen
 	public void initalizeData() {
 		getTextFilesToArray();
 		getTimeArrays();
