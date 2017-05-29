@@ -42,9 +42,12 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     
     // speech-api
+
     compile group: 'com.google.cloud', name: 'google-cloud-speech', version: '0.15.0-alpha'
     
      //GSON
     compile 'com.google.code.gson:gson:2.2.4'
+    compile group: 'com.google.cloud', name: 'google-cloud-speech', version: '0.17.1-alpha'
+
 }
 
