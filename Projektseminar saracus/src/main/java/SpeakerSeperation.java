@@ -584,7 +584,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		for (int i = 0; i < (audiofilesKU.length + audiofilesCA.length); i++) {
 			if ((startzeitenKUrdy[currentPositionKU] < startzeitenCArdy[currentPositionCA]) || (CAfinished)) {
 				bundler.addGespraechsStruktur("\n Kunde:  " + currentPositionKU);
-				processAudio(audiofilesKU[currentPositionKU], "K: ");
+				processAudio(audiofilesKU[currentPositionKU], "Customer");
 
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
 					currentPositionKU++;
@@ -595,7 +595,7 @@ public class SpeakerSeperation extends AudioProcessing {
 			} else {
 				if ((startzeitenCArdy[currentPositionCA] < startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
 					bundler.addGespraechsStruktur("\n Agent:  " + currentPositionCA);
-					processAudio(audiofilesCA[currentPositionCA], "A: ");
+					processAudio(audiofilesCA[currentPositionCA], "Agent");
 
 					if (currentPositionCA < startzeitenCArdy.length - 1) {
 						currentPositionCA++;

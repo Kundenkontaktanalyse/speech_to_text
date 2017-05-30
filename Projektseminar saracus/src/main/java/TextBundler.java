@@ -1,5 +1,7 @@
 import java.io.*;
 import com.google.gson.*;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class TextBundler {
@@ -83,6 +85,7 @@ public void speichereDialoginTXT(String speicherdestination) {
 public void generiereJSON(String fileDestination, String jsonInput) throws JsonIOException, IOException{
 	String id=uuid.generiereStringID();
 	String filename="Gespraech"+id+".json";
+	
 	//System.out.println(konfidenzListenListe.getFirst().toString());
 	try{
 		 fromGson= gsonIn.fromJson
@@ -92,7 +95,7 @@ public void generiereJSON(String fileDestination, String jsonInput) throws JsonI
 	
 	//System.out.println(konfidenzListeOutput);
 //	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutputJson(), dauerListe, konfidenzListeDurchschnitt, fromGson);
-	JsonStructure jsonStructure=new JsonStructure(snippetlist, fromGson);
+	JsonStructure jsonStructure=new JsonStructure(adaptSnippetlist(), fromGson);
 	String json=gson.toJson(jsonStructure);
 	String jsonInTeast=fromGson.toString();
 	System.out.println(jsonInTeast);
@@ -135,6 +138,16 @@ public void setSnippetListSize(int i){
 	snippetlist=new Snippet[i];
 }
 
+public ArrayList<Snippet> adaptSnippetlist(){
+	ArrayList<Snippet> cuttedSnippetlist=new ArrayList<Snippet>();
+	for (int i=0; i<snippetlist.length;i++){
+		if(snippetlist[i]!= null){
+		cuttedSnippetlist.add(snippetlist[i]);
+		}
+	}
+	
+return cuttedSnippetlist;
+}
 public void addSnippet(String role, String transcript, double length, float confidence){
 	snippetlist[counter]=new Snippet(role, transcript, length, confidence);
 	counter++;

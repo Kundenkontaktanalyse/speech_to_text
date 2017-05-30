@@ -1,22 +1,24 @@
+import java.util.ArrayList;
+
 import com.google.gson.JsonElement;
 
 public class JsonStructure {
 	
-	private Snippet []snippetlist; //Liste von Schnipsels. 
+	private ArrayList<Snippet>snippetlist; //Liste von Schnipsels. 
 	private JsonElement metadata;  // Json-Input z.B. generiert durch CRM oder Genesys.
 	
 	
-	public JsonStructure (Snippet[]snippetlist, JsonElement metadata){
+	public JsonStructure (ArrayList<Snippet>snippetlist, JsonElement metadata){
 		this.snippetlist=snippetlist;
 		this.metadata=metadata;
 	}
 	
-	public Snippet[] getSnippetlist() {
+	public ArrayList<Snippet> getSnippetlist() {
 		return snippetlist;
 	}
 
 
-	public void setSnippetlist(Snippet[] snippetlist) {
+	public void setSnippetlist(ArrayList<Snippet>snippetlist) {
 		this.snippetlist = snippetlist;
 	}
 
