@@ -173,8 +173,9 @@ class AudioProcessing extends FileChooser {
 		bundler.konfidenzDurschnittErmitteln();
 		bundler.fuegeDauerHinzu(dauerges);
 		System.out.println("role"+role+ " Tra:" + transcript);
-		bundler.addSnippet(this.role, transcript, dauerges, (float)Math.ceil((double)confidence/(dauerges/15)));
+		bundler.addSnippet(role, transcript, dauerges, (confidence/((int)(dauerges/15)+1)));
 		transcript=null;
+		confidence=0;
 //		bundler.generiereJSON();
 		
 	}
