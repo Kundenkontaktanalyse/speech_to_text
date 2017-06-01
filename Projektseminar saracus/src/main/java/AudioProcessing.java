@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.sound.sampled.*;
 
-import com.google.api.client.util.Lists;
 import com.google.cloud.speech.spi.v1.SpeechClient;
 import com.google.cloud.speech.v1.RecognitionAudio;
 import com.google.cloud.speech.v1.RecognitionConfig;
@@ -31,7 +30,9 @@ class AudioProcessing extends FileChooser {
 	String sourceFileName;
 	int sampleRate;
 	double dauerges;
-
+	String role;
+	String transcript;
+	float confidence;
 	
 	
 	public void recognize(String fileName) throws Exception, IOException {
@@ -69,7 +70,12 @@ class AudioProcessing extends FileChooser {
 		  for (SpeechRecognitionResult result: results) {
 		    List<SpeechRecognitionAlternative> alternatives = result.getAlternativesList();
 		    for (SpeechRecognitionAlternative alternative: alternatives) {
-		     // System.out.printf("Transcription: %s%n", alternative.getTranscript());
+		    	
+		    	if(transcript==null){transcript=alternative.getTranscript();
+		    	}
+		    	else transcript=transcript+ alternative.getTranscript();
+		    	confidence=confidence+alternative.getConfidence();
+		    	System.out.println("transcript"+ transcript);
 		      bundler.addTextSync(alternative.getTranscript(), alternative.getConfidence());
 		      System.out.println(alternative.getConfidence());
 		    }
@@ -79,13 +85,15 @@ class AudioProcessing extends FileChooser {
 		}
 	
 	
-	public void processAudio(File sourceFile) {
+	public void processAudio(File sourceFile, String role) {
 		
 		String sourceFilePath = sourceFile.getPath().toString();
 		String destinationFileName = sourceFilePath;
 		AudioInputStream inputStream = null;
 		AudioInputStream shortenedStream = null;
 		int secondsToCopy = 50;
+		System.out.println("processAudio");
+        System.out.println("");
 
 		try {
 			File file = new File(sourceFilePath);
@@ -165,6 +173,10 @@ class AudioProcessing extends FileChooser {
 		}
 		bundler.konfidenzDurschnittErmitteln();
 		bundler.fuegeDauerHinzu(dauerges);
+		System.out.println("role"+role+ " Tra:" + transcript);
+		bundler.addSnippet(role, transcript, dauerges, (confidence/((int)(dauerges/15)+1)));
+		transcript=null;
+		confidence=0;
 //		bundler.generiereJSON();
 		
 	}
