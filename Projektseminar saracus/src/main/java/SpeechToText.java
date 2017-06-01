@@ -35,7 +35,7 @@ public class SpeechToText extends AudioProcessing {
 		SpeakerSeperation spsep = new SpeakerSeperation(sourceFile);
 		spsep.processFiles(ffmpegExeOrdner);
 		bundler.generiereJSON(ffmpegExeOrdner, jsonInput);
-		//bundler.speichereDialoginTXT(ffmpegExeOrdner);
+		bundler.speichereDialoginTXT(ffmpegExeOrdner);
 
 	}
 }

@@ -84,7 +84,7 @@ public void speichereDialoginTXT(String speicherdestination) {
 
 public void generiereJSON(String fileDestination, String jsonInput) throws JsonIOException, IOException{
 	String id=uuid.generiereStringID();
-	String filename="Gespraech"+id+".json";
+	String filename="Gespraech_"+id+".json";
 	
 	//System.out.println(konfidenzListenListe.getFirst().toString());
 	try{
