@@ -5,6 +5,10 @@ import java.nio.channels.FileChannel;
 
 public class manageJavaInput extends FileChooser {
 
+	
+	
+	
+	@SuppressWarnings("resource")
 	private boolean isFileClosed(File file) {
 
 		boolean closed;
@@ -57,6 +61,8 @@ public class manageJavaInput extends FileChooser {
 			}
 		}
 
+		System.out.println("ffmpeg bearbeitung abgeschlossen" );
+		
 		// Erstellen der gestutzten Text-dateien mit Start- und End-zeiten aus
 		// ffmpeg-output
 
@@ -75,8 +81,7 @@ public class manageJavaInput extends FileChooser {
 		myCutter.identifyStartTimes(caOut, caStarttimes);
 		myCutter.identifyEndTimes(caOut, caEndtimes);
 
-		kunOut.delete();
-		caOut.delete();
+		
 
 		// warteschleiﬂe zum Abwarten der input txt files
 		while (true) {
@@ -89,5 +94,8 @@ public class manageJavaInput extends FileChooser {
 			}
 		}
 
+		kunOut.delete();
+		caOut.delete();
+		System.out.println("ffmpeg output in txt-datei geschnitten");
 	}
 }

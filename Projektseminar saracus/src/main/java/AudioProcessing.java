@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.sound.sampled.*;
 
-import com.google.api.client.util.Lists;
 import com.google.cloud.speech.spi.v1.SpeechClient;
 import com.google.cloud.speech.v1.RecognitionAudio;
 import com.google.cloud.speech.v1.RecognitionConfig;
@@ -93,6 +92,8 @@ class AudioProcessing extends FileChooser {
 		AudioInputStream inputStream = null;
 		AudioInputStream shortenedStream = null;
 		int secondsToCopy = 50;
+		System.out.println("processAudio");
+        System.out.println("");
 
 		try {
 			File file = new File(sourceFilePath);

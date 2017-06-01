@@ -141,7 +141,7 @@ public void setSnippetListSize(int i){
 public ArrayList<Snippet> adaptSnippetlist(){
 	ArrayList<Snippet> cuttedSnippetlist=new ArrayList<Snippet>();
 	for (int i=0; i<snippetlist.length;i++){
-		if(snippetlist[i]!= null){
+		if(snippetlist[i]!= null && snippetlist[i].getTranscription()!=null){
 		cuttedSnippetlist.add(snippetlist[i]);
 		}
 	}
