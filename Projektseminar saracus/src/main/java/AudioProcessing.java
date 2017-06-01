@@ -75,7 +75,6 @@ class AudioProcessing extends FileChooser {
 		    	}
 		    	else transcript=transcript+ alternative.getTranscript();
 		    	confidence=confidence+alternative.getConfidence();
-		    	System.out.println("transcript"+ transcript);
 		      bundler.addTextSync(alternative.getTranscript(), alternative.getConfidence());
 		      System.out.println(alternative.getConfidence());
 		    }

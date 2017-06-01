@@ -98,7 +98,6 @@ public void generiereJSON(String fileDestination, String jsonInput) throws JsonI
 	JsonStructure jsonStructure=new JsonStructure(adaptSnippetlist(), fromGson);
 	String json=gson.toJson(jsonStructure);
 	String jsonInTeast=fromGson.toString();
-	System.out.println(jsonInTeast);
 	
 	try{ 
 	FileWriter writer = new FileWriter(fileDestination+"//"+filename);

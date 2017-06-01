@@ -56,7 +56,7 @@ public class TimesCut extends FileChooser {
 			}
 			if (Zeile.contains("silence_start")) { // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 				int indexDoppelpunkt = Zeile.indexOf(":") + 1;
-				int indexSonderzeichen = Zeile.length() - 1;
+				int indexSonderzeichen = Zeile.length();
 				Zeile = Zeile.substring(indexDoppelpunkt, indexSonderzeichen);
 				Zeile.replaceAll("[^.0-9" + "]", "");
 				out.write(Zeile);

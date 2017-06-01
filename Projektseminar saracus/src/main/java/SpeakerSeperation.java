@@ -353,11 +353,11 @@ public class SpeakerSeperation extends AudioProcessing {
 		textfiles = ParentsourceFile.listFiles(new TextFilter());
 		Arrays.sort(textfiles);
 
-		// for (int i = 0; i < textfiles.length; i++) {
-		// System.out.println(textfiles[i].getAbsolutePath());
-		// System.out.println(textfiles[i].getName());
-		//
-		// }
+//		 for (int i = 0; i < textfiles.length; i++) {
+//		 System.out.println(textfiles[i].getAbsolutePath());
+//		 System.out.println(textfiles[i].getName());
+//		
+//		 }
 		
 		System.out.println("Txt-dateien in filearray abgelegt");
         System.out.println("");
@@ -389,9 +389,9 @@ public class SpeakerSeperation extends AudioProcessing {
 		// Zeiten, da Trennung "vor" erstem String
 		String[] StringZeiten = inputString.split("\\s+");
 
-		// for (int i = 0; i < StringZeiten.length; i++) {
-		// System.out.println("ziffernString = " + StringZeiten[i]);
-		// }
+		 for (int i = 0; i < StringZeiten.length; i++) {
+		 System.out.println("ziffernString = " + StringZeiten[i]);
+		 }
 
 		// Strings in Integer parsen (stringArray besitzt als ersten string nur
 		// leerzeichen durch trennung, daher indexverschiebung)
