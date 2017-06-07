@@ -75,7 +75,7 @@ class AudioProcessing extends FileChooser {
 		    	}
 		    	else transcript=transcript+ alternative.getTranscript();
 		    	confidence=confidence+alternative.getConfidence();
-		      bundler.addTextSync(alternative.getTranscript(), alternative.getConfidence());
+		      bundler.addTextSync(alternative.getTranscript());
 		      System.out.println(alternative.getConfidence());
 		    }
 		  }
@@ -170,8 +170,6 @@ class AudioProcessing extends FileChooser {
 					System.out.println(e);
 				}
 		}
-		bundler.konfidenzDurschnittErmitteln();
-		bundler.fuegeDauerHinzu(dauerges);
 		System.out.println("role"+role+ " Tra:" + transcript);
 		bundler.addSnippet(role, transcript, dauerges, (confidence/((int)(dauerges/15)+1)));
 		transcript=null;

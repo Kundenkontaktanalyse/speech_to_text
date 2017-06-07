@@ -43,7 +43,6 @@ public class AsyncProcess {
 		    List<SpeechRecognitionAlternative> alternatives = result.getAlternativesList();
 		    for (SpeechRecognitionAlternative alternative: alternatives) {
 		      System.out.printf("Transcription: %s%n", alternative.getTranscript());
-		      bundler.addTextAsync(alternative.getTranscript());
 		    }
 		  }
 		  speech.close();

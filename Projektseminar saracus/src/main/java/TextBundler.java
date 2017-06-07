@@ -1,74 +1,57 @@
 import java.io.*;
 import com.google.gson.*;
-
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class TextBundler {
-	 private String finalerOutputJson;
-	 private String finalerOutputDialog;
-	 LinkedList<Float> konfidenzListe=new LinkedList<Float>();
-	 LinkedList<Double> dauerListe=new LinkedList<Double>();	
-	 LinkedList <Float> konfidenzListeDurchschnitt= new  LinkedList <Float>();
-	 Gson gson= new GsonBuilder().create();
-	 GenerateUUID uuid=new GenerateUUID();
-	 Gson gsonIn= new Gson();
-	 JsonElement fromGson;	
-	 Snippet[] snippetlist;
-	 int counter=0;
+	 private String finalerOutputDialog; //Output, der in .txt-Datei eingebunden ist.
+	 Gson gson= new GsonBuilder().create(); //gsonBuilder
+	 GenerateUUID uuid=new GenerateUUID(); // Java-Klasse zum Erzeugen einer UUID.
+	 Gson gsonIn= new Gson();			// Gson-Element
+	 JsonElement fromGson;				//Json-Input-Element mit Metadaten
+	 Snippet[] snippetlist;				//Schnipselliste
+	 private int counter=0;				//Counter zum befüllen des Arrays
+/*
+ *Getter- und Setter-Methoden 	 
+ *
+ */
+public String getFinalerOutputDialog() {
+			return finalerOutputDialog;
+		}
+
+public void setFinalerOutputDialog(String finalerOutputDialog) {
+			this.finalerOutputDialog = finalerOutputDialog;
+		}
 	 
-
-private double sekUndMin(double sek){
-	double sekTemp=(sek%60.0)*0.01;
-	int sekMin=(int)sek/60;
-	return (sekTemp+sekMin);
-}
-
+	 
+/**
+ * Strukturiert den Gespraechsoutput 
+ * @param s die Rolle mit Leerzeichen.
+ */
 public void addGespraechsStruktur(String s){
 	if(getFinalerOutputDialog()==null){setFinalerOutputDialog("\n"+s);
-									   setFinalerOutputJson(s);}
+									   }
 	else{setFinalerOutputDialog(getFinalerOutputDialog()+"\n"+" "+s);
-		 setFinalerOutputJson(getFinalerOutputJson()+" "+s);
 	}
-}
-public float konfidenzDurschnittErmitteln(){
-	float summe=0;
-	while(!konfidenzListe.isEmpty()){
-		//System.out.println(getKonfidenzListe().getFirst().toString());
-		int i=konfidenzListe.size();
-		while(!konfidenzListe.isEmpty()){
-			summe=summe+konfidenzListe.getFirst();
-			konfidenzListe.remove();
-		}
-		summe=summe/i;
-	}
-	 konfidenzListeDurchschnitt.add(summe);
-	 return summe;
 }
 
-public void addTextSync(String a, float k){
-	konfidenzListe.add(k);
+/**
+* Fügt Text für den txt-Output hinzu.
+ * @param a der transkribierte Text.
+ */
+public void addTextSync(String a){
 	
-if(getFinalerOutputJson()==null){ setFinalerOutputJson(a);
-								  setFinalerOutputDialog(a);
-
+if(getFinalerOutputDialog()==null){
+	setFinalerOutputDialog(a);
 }
-else{setFinalerOutputJson(getFinalerOutputJson()+" "+a);
+else{
 	 setFinalerOutputDialog(getFinalerOutputDialog()+" "+a);
 	}
 }
 
-public void fuegeDauerHinzu(double dauer){
-	dauerListe.add(Math.round(sekUndMin(dauer)*10000)/10000.0);
-}
-
-// INAKTIV!
-public void addTextAsync(String a) throws JsonIOException, IOException{
-	setFinalerOutputJson(a);
-	
-	// speichereDialoginTXT();	
-}
-
+/**
+ * speichert das Telefongespraech in einer .txt Datei.
+ * @param speicherdestination
+ */
 public void speichereDialoginTXT(String speicherdestination) {
 
 	BufferedWriter out;
@@ -82,7 +65,13 @@ public void speichereDialoginTXT(String speicherdestination) {
 	}
 }
 
-public void generiereJSON(String fileDestination, String jsonInput) throws JsonIOException, IOException{
+/**
+ *  Generiert einen Json-Output, der aus den Meta-Inputdaten im json-Format besteht und einer Liste der transkribierten Schnipsel besteht. 
+ *  Der Datei-Name besteht aus einer generierten UUID.
+ * @param fileDestination der Speicherort des Outputs
+ * @param jsonInput die Input-Datei; besteht aus Metadaten, z.B. aus CRM-System
+ */
+public void generiereJSON(String fileDestination, String jsonInput){
 	String id=uuid.generiereStringID();
 	String filename="Gespraech"+id+".json";
 	
@@ -97,8 +86,6 @@ public void generiereJSON(String fileDestination, String jsonInput) throws JsonI
 //	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutputJson(), dauerListe, konfidenzListeDurchschnitt, fromGson);
 	JsonStructure jsonStructure=new JsonStructure(adaptSnippetlist(), fromGson);
 	String json=gson.toJson(jsonStructure);
-	String jsonInTeast=fromGson.toString();
-	
 	try{ 
 	FileWriter writer = new FileWriter(fileDestination+"//"+filename);
 	writer.write(json);
@@ -108,35 +95,22 @@ public void generiereJSON(String fileDestination, String jsonInput) throws JsonI
 	}catch(IOException e){
 		e.printStackTrace();
 	}
-	System.out.println(json);
-
-	
-}
-
-public String getFinalerOutputJson() {
-	return finalerOutputJson;
-}
-
-public void setFinalerOutputJson(String finalerOutputJson) {
-	this.finalerOutputJson = finalerOutputJson;
-}
-
-public String getFinalerOutputDialog() {
-	return finalerOutputDialog;
-}
-
-public void setFinalerOutputDialog(String finalerOutputDialog) {
-	this.finalerOutputDialog = finalerOutputDialog;
+	System.out.println(json);	
 }
 
 /**
- * setzt das schnipselarray auf die richtige groeße.
+ * setzt das Schnipselarray auf die richtige groeße (z.B. hier: Anzahl der Audioschnipsel insgesamt).
  * @param i groeße des arrays.
  */
 public void setSnippetListSize(int i){
 	snippetlist=new Snippet[i];
 }
 
+/**
+ * Macht aus Array mit Schnipseln eine Array-List. In ihr sind nur noch Schnipsel enthalten, die nicht leer sind und dessen Transkript
+ * nicht leer ist.
+ * @return
+ */
 public ArrayList<Snippet> adaptSnippetlist(){
 	ArrayList<Snippet> cuttedSnippetlist=new ArrayList<Snippet>();
 	for (int i=0; i<snippetlist.length;i++){
@@ -147,30 +121,18 @@ public ArrayList<Snippet> adaptSnippetlist(){
 	
 return cuttedSnippetlist;
 }
+
+/**
+ * Fügt dem Schnipsel-array einen weiteren Schnipsel(snippet) hinzu.
+ * @param role die Rolle des Sprechers
+ * @param transcript der gesagte Text
+ * @param length die Laenge des Audio-Schnipsels
+ * @param confidence die von der Google-Api übermittelte Sicherheit, dass es sich um das richtige Ergebnishandelt (zwischen 0 und 1)
+ */
 public void addSnippet(String role, String transcript, double length, float confidence){
 	snippetlist[counter]=new Snippet(role, transcript, length, confidence);
 	counter++;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 
