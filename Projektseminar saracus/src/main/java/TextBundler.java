@@ -6,22 +6,41 @@ public class TextBundler {
 	 private String finalerOutputDialog; //Output, der in .txt-Datei eingebunden ist.
 	 Gson gson= new GsonBuilder().create(); //gsonBuilder
 	 GenerateUUID uuid=new GenerateUUID(); // Java-Klasse zum Erzeugen einer UUID.
+	 String uuidString;
 	 Gson gsonIn= new Gson();			// Gson-Element
 	 JsonElement fromGson;				//Json-Input-Element mit Metadaten
 	 Snippet[] snippetlist;				//Schnipselliste
 	 private int counter=0;				//Counter zum befüllen des Arrays
+	 private double audioLength;
+
+	 
+	 public TextBundler (){
+		uuidString=uuid.generiereStringID(); 
+	 }
 /*
  *Getter- und Setter-Methoden 	 
  *
  */
+	 
+	 
 public String getFinalerOutputDialog() {
 			return finalerOutputDialog;
 		}
 
+
 public void setFinalerOutputDialog(String finalerOutputDialog) {
 			this.finalerOutputDialog = finalerOutputDialog;
 		}
-	 
+
+public double getAudioLength() {
+	return audioLength;
+}
+
+
+public void setAudioLength(double audioLength) {
+	this.audioLength = audioLength;
+}
+
 	 
 /**
  * Strukturiert den Gespraechsoutput 
@@ -72,8 +91,8 @@ public void speichereDialoginTXT(String speicherdestination) {
  * @param jsonInput die Input-Datei; besteht aus Metadaten, z.B. aus CRM-System
  */
 public void generiereJSON(String fileDestination, String jsonInput){
-	String id=uuid.generiereStringID();
-	String filename="Gespraech"+id+".json";
+	String filename="Gespraech"+uuidString+".json";
+	DialogueData dialoguedata=new DialogueData(getAudioLength() , uuidString);
 	
 	//System.out.println(konfidenzListenListe.getFirst().toString());
 	try{
@@ -84,7 +103,7 @@ public void generiereJSON(String fileDestination, String jsonInput){
 	
 	//System.out.println(konfidenzListeOutput);
 //	JSONSetting jsonSettings=new JSONSetting(id, getFinalerOutputJson(), dauerListe, konfidenzListeDurchschnitt, fromGson);
-	JsonStructure jsonStructure=new JsonStructure(adaptSnippetlist(), fromGson);
+	JsonStructure jsonStructure=new JsonStructure(adaptSnippetlist(), fromGson, dialoguedata);
 	String json=gson.toJson(jsonStructure);
 	try{ 
 	FileWriter writer = new FileWriter(fileDestination+"//"+filename);
@@ -113,9 +132,14 @@ public void setSnippetListSize(int i){
  */
 public ArrayList<Snippet> adaptSnippetlist(){
 	ArrayList<Snippet> cuttedSnippetlist=new ArrayList<Snippet>();
+	int idcounter=0;
 	for (int i=0; i<snippetlist.length;i++){
 		if(snippetlist[i]!= null && snippetlist[i].getTranscription()!=null){
 		cuttedSnippetlist.add(snippetlist[i]);
+		String idcounterString=String.valueOf(idcounter);
+		cuttedSnippetlist.get(idcounter).setSnippetId(uuidString+"-"+cuttedSnippetlist.get(idcounter).getRole() +
+				idcounterString);
+		idcounter++;
 		}
 	}
 	

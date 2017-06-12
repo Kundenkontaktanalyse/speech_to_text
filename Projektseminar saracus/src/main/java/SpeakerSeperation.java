@@ -79,6 +79,7 @@ public class SpeakerSeperation extends AudioProcessing {
 	double[] startzeitenCArdy;
 	double[] endzeitenKUrdy;
 	double[] endzeitenCArdy;
+	double audioLength;
 
 	public SpeakerSeperation(File sourceFile) {
 		this.sourceFile = sourceFile;
@@ -113,6 +114,7 @@ public class SpeakerSeperation extends AudioProcessing {
  
         int bytesPerSecondFuerLaenge = formatFuerLaenge.getFrameSize() * (int) formatFuerLaenge.getFrameRate(); // hz*bytes/frames
         double audioSekunden = audioFileLength / bytesPerSecondFuerLaenge;
+        audioLength=audioSekunden;
  
         double[] endzeitenrdy = null;
  

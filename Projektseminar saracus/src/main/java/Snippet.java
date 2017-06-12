@@ -2,9 +2,11 @@
 public class Snippet {
 	
 	private String role; // Rolle des Sprechers (K oder A).
+	private String snippetID; //SchnipselID.
 	private String transcription; // der Text des Schnipsels.
 	private double length; // laenge des Schnipsels mm.ss
-	private float confidence; // Konfidenz-Score
+	private float confidence; // Konfidenz-Score.
+	
 	
 	public Snippet(String role, String transcription, double length, float confidence){
 		this.role=role;
@@ -15,6 +17,18 @@ public class Snippet {
 	
 	
 	
+	public String getSnippetId() {
+		return snippetID;
+	}
+
+
+
+	public void setSnippetId(String id) {
+		this.snippetID = id;
+	}
+
+
+
 	public String getRole() {
 		return role;
 	}
