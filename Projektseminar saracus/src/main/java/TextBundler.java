@@ -106,7 +106,7 @@ public void generiereJSON(String fileDestination, String jsonInput){
 	JsonStructure jsonStructure=new JsonStructure(adaptSnippetlist(), fromGson, dialoguedata);
 	String json=gson.toJson(jsonStructure);
 	try{ 
-	FileWriter writer = new FileWriter(fileDestination+"//"+filename);
+	Writer writer = new OutputStreamWriter(new FileOutputStream (fileDestination+"//"+filename) , "UTF-8");
 	writer.write(json);
 	writer.close();
 	
