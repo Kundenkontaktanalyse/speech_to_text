@@ -35,14 +35,14 @@ public class manageJavaInput extends FileChooser {
 
 	}
 
-	public void manage(String fmmpegExeOrdner) {
+	public void manage(String fmmpegExeOrdner, File caInput, File kunInput) {
 
 		// -------------------------------------------------------------------------------------------------------
 
 		// Erstellen des Ffmpeg-Outputs aus beiden Channeln
 
-		File caChannel = choose();
-		File kuChannel = choose();
+		File caChannel = caInput;
+		File kuChannel = kunInput;
 		String ffmpegPfadCMD = "cd \"" + fmmpegExeOrdner + "\"";
 
 		ffmpegClass myffmpegClass = new ffmpegClass();

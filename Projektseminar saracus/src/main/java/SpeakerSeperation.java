@@ -17,7 +17,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  * Erwartet: FileChooser-Übergabe eines Verzeichnesses mit Unterordnern A und B mit jeweilig gecutteten Unterdateien A.1, A.2 etc 
  * 
  * 
- * Zusammenspiel der Klassen:
+ * Zusammenspiel der Klassen: VERALTET!
  * Momentan:
  * main ruft AudioProcessing.processAudio auf
  * diese in line 64 den filechooser, der ausgewähltes FILE zurückliefert
@@ -27,7 +27,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  * dieser buffert die einzelnen textteile und schreibt sie in eine vom FileWriter erstellte (?) neue Datei
  *  
  *  
- * Ziel / to-do:
+ * Ziel / to-do: DONE! (?)
  * 
  *  processFiles startet Prozess
  *  FileChooser nimmt einen Audioschnitt an CHECK
