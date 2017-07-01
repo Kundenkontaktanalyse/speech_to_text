@@ -90,8 +90,8 @@ public void speichereDialoginTXT(String speicherdestination) {
  * @param fileDestination der Speicherort des Outputs
  * @param jsonInput die Input-Datei; besteht aus Metadaten, z.B. aus CRM-System
  */
-public void generiereJSON(String fileDestination, String jsonInput){
-	String filename="Gespraech"+uuidString+".json";
+public void generiereJSON(String filename, String fileDestination, String jsonInput){
+	String filenameWithEnding= filename + ".json";
 	DialogueData dialoguedata=new DialogueData(getAudioLength() , uuidString);
 	
 	//System.out.println(konfidenzListenListe.getFirst().toString());
@@ -106,7 +106,7 @@ public void generiereJSON(String fileDestination, String jsonInput){
 	JsonStructure jsonStructure=new JsonStructure(adaptSnippetlist(), fromGson, dialoguedata);
 	String json=gson.toJson(jsonStructure);
 	try{ 
-	Writer writer = new OutputStreamWriter(new FileOutputStream (fileDestination+"//"+filename) , "UTF-8");
+	Writer writer = new OutputStreamWriter(new FileOutputStream (fileDestination+"//"+filenameWithEnding) , "UTF-8");
 	writer.write(json);
 	writer.close();
 	
@@ -115,6 +115,7 @@ public void generiereJSON(String fileDestination, String jsonInput){
 		e.printStackTrace();
 	}
 	System.out.println(json);	
+	counter = 0;
 }
 
 /**
@@ -159,9 +160,4 @@ public void addSnippet(String role, String transcript, double length, float conf
 }
 
 }
-
-
-
-
-
 

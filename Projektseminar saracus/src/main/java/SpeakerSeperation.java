@@ -63,8 +63,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class SpeakerSeperation extends AudioProcessing {
 
-	File sourceFile;
-	File ParentsourceFile;
+	File lokalFfmpegFile;
+	File lokalFfmpegParentDirectory;
 	File[] audioChannels;
 	File[] audiofiles;
 	File[] audiofilesKU;
@@ -81,8 +81,8 @@ public class SpeakerSeperation extends AudioProcessing {
 	double[] endzeitenCArdy;
 	double audioLength;
 
-	public SpeakerSeperation(File sourceFile) {
-		this.sourceFile = sourceFile;
+	public SpeakerSeperation(File lokalFfmpegFile) {
+		this.lokalFfmpegFile = lokalFfmpegFile;
 	}
 
 	// Methode zum Schneiden von AudioDateien: Legt die AudioSchnitte im
@@ -310,7 +310,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		
 		System.out.println("getAudioFilesToArray:");
 
-		ParentsourceFile = sourceFile.getParentFile();
+		lokalFfmpegParentDirectory = lokalFfmpegFile.getParentFile();
 
 		// Filter zur kontrolle ob Datei mit .wav endet
 		class AudioFilter implements FileFilter {
@@ -321,7 +321,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		}
 
 		// Ablage aller Audiodateien des Verzeichnisses in audiofiles[]
-		File[] files = ParentsourceFile.listFiles(new AudioFilter());
+		File[] files = lokalFfmpegParentDirectory.listFiles(new AudioFilter());
 		Arrays.sort(files);
 
 		// for (int i = 0; i < audiofiles.length; i++) {
@@ -339,7 +339,7 @@ public class SpeakerSeperation extends AudioProcessing {
 
 	public void getTextFilesToArray() {
 
-		ParentsourceFile = sourceFile.getParentFile();
+		lokalFfmpegParentDirectory = lokalFfmpegFile.getParentFile();
 
 		
 		System.out.println("getTextFilesToArray:");
@@ -352,7 +352,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		}
 
 		// Ablage aller Textdateien des Verzeichnisses in textfiles[]
-		textfiles = ParentsourceFile.listFiles(new TextFilter());
+		textfiles = lokalFfmpegParentDirectory.listFiles(new TextFilter());
 		Arrays.sort(textfiles);
 
 //		 for (int i = 0; i < textfiles.length; i++) {

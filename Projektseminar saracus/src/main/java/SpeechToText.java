@@ -28,66 +28,24 @@ public class SpeechToText extends AudioProcessing {
 	
 	File VerzeichnisOrdner = new File(VerzeichnisPfad);
 	
-	// Methode zur Ermittlung der Gesprächsanzahl (zu transkibierende Tripel)
-	// Annahme: Trennung zwischen ID und Kennzahl 0=Json 1=agent 2=kunde per "_", in ID nicht enthalten, Name besteht nur
-	// aus ID + _ + Kennzahl
-	// TODO
-	public int identifyTripleAmount(){
-		int count = 0;
-		File[][] triples = null;
-		String[] filesNames = VerzeichnisOrdner.list();
 		
-		for(int i = 0; i < filesNames.length; i++){
-
-			if (filesNames[i].contains("_")){
-				
-			}
-			
-			gedankengang:
-				id bei _ trennen
-				checken ob Id_0, id_1, id_2 existieren,
-				falls ja als tripel ablegen, falls nein ggfs in error[] ablegen
-				weiter beim nächsten korrekten index
-				
-				annahme für laufzeiteffizienz? alle drei dateien direkt hintereinander
-						um gesamtsuchdurchlauf durchlauf zu verhindern?
-
-		}
-		
-		return count;
-	}
 	
 	
-	// Methode zum erzeugen von Daten-Tripeln aus einem Verzeichnis, bestehend aus 1) Json 2) Ca-Agent 3) Kunde
-	// Array wird von Main (Verzeichnismanager) durchlaufen und invokeTranslation mit Tripeln aufgerufen
-	// TODO
-	public File[][] generateDataTriples(){
+	public void invokeTranslation(String idName, String outputDestination, File jsonInput, File caInput, File kunInput, File ffmpegFile ) throws IOException{
 		
-		File[][] triples = null;
-		
-		
-		
-		return triples;
-	}
-	
-	public void invokeTranslation(File jsonInput, File caInput, File kunInput) throws IOException{
-		
+		System.out.println("invokeTranslation");
 		
 		Properties properties = new Properties();
 		BufferedInputStream stream = new BufferedInputStream(new FileInputStream("s2tProperties.properties"));
 		properties.load(stream);
 		stream.close();
-		String ffmpegpath = properties.getProperty("ffmpegpath");
-//		String agentPath = properties.getProperty("agentPath");
-//		String customerPath = properties.getProperty("customerPath");
 		
 
 //		FileChooser myChooser = new FileChooser();
 
 		// Ort der ffmpegEXE und der beiden Audio Channels
-		File sourceFile = new File(ffmpegpath);
 		String jsonInputPath=jsonInput.toString();
-		String ffmpegExeOrdner = sourceFile.getParent();
+		String ffmpegExeOrdner = ffmpegFile.getParent();
 
 		// myChooser.choose();
 // ----------------------------------------------------------------
@@ -97,13 +55,13 @@ public class SpeechToText extends AudioProcessing {
 
 // ----------------------------------------------------------------
 
-		SpeakerSeperation spsep = new SpeakerSeperation(sourceFile);
+		SpeakerSeperation spsep = new SpeakerSeperation(ffmpegFile);
 		spsep.processFiles(ffmpegExeOrdner);
 //		spsep.initalizeData();
 		
 		bundler.setAudioLength(spsep.audioLength);
-		bundler.generiereJSON(ffmpegExeOrdner, jsonInputPath);
-		bundler.speichereDialoginTXT(ffmpegExeOrdner);
+		bundler.generiereJSON(idName, outputDestination, jsonInputPath);
+//		bundler.speichereDialoginTXT(ffmpegExeOrdner);
 
 		
 	}
