@@ -5,7 +5,7 @@ import java.nio.channels.FileChannel;
 
 public class manageJavaInput extends FileChooser {
 
-	public void manage(String fmmpegExeOrdner, File caInput, File kunInput) {
+	public void manage(String temp, String fmmpegExeOrdner, File caInput, File kunInput) {
 
 		
 		System.out.println("manage");
@@ -19,8 +19,8 @@ public class manageJavaInput extends FileChooser {
 
 		ffmpegClass myffmpegClass = new ffmpegClass();
 
-		File kunOut = new File(fmmpegExeOrdner + "\\kunOut.txt");
-		File caOut = new File(fmmpegExeOrdner + "\\caOut.txt");
+		File kunOut = new File(temp + "\\kunOut.txt");
+		File caOut = new File(temp + "\\caOut.txt");
 		myffmpegClass.audioToMetaData(caChannel.getName(), kuChannel.getName(), caOut, kunOut, ffmpegPfadCMD);
 
 		// ---------------------------------------------------------------------------------------------------------
@@ -43,10 +43,10 @@ public class manageJavaInput extends FileChooser {
 		// File caOut = new File(fmmpegExeOrdner + "\\caOut.txt");
 		// File kunOut = new File(fmmpegExeOrdner + "\\kunOut.txt");
 
-		File kunStarttimes = new File(fmmpegExeOrdner + "\\K1.txt");
-		File kunEndtimes = new File(fmmpegExeOrdner + "\\K2.txt");
-		File caStarttimes = new File(fmmpegExeOrdner + "\\C1.txt");
-		File caEndtimes = new File(fmmpegExeOrdner + "\\C2.txt");
+		File kunStarttimes = new File(temp + "\\K1.txt");
+		File kunEndtimes = new File(temp + "\\K2.txt");
+		File caStarttimes = new File(temp + "\\C1.txt");
+		File caEndtimes = new File(temp + "\\C2.txt");
 
 		myCutter.identifyStartTimes(kunOut, kunStarttimes);
 		myCutter.identifyEndTimes(kunOut, kunEndtimes);

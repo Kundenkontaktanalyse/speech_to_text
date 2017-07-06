@@ -84,7 +84,7 @@ class AudioProcessing extends FileChooser {
 		}
 	
 	
-	public void processAudio(File sourceFile, String role) {
+	public void processAudio(File sourceFile, String role, double puffer) {
 		
 		String sourceFilePath = sourceFile.getPath().toString();
 		String destinationFileName = sourceFilePath;
@@ -171,7 +171,7 @@ class AudioProcessing extends FileChooser {
 				}
 		}
 		System.out.println("role"+role+ " Tra:" + transcript);
-		bundler.addSnippet(role, transcript, dauerges, (confidence/((int)(dauerges/15)+1)));
+		bundler.addSnippet(role, transcript, dauerges - 2*puffer, (confidence/((int)(dauerges/15)+1)));
 		transcript=null;
 		confidence=0;
 //		bundler.generiereJSON();

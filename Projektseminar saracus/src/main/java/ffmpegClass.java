@@ -13,8 +13,8 @@ public class ffmpegClass extends FileChooser {
 				// CMD ausführen
 				"cmd.exe", "/c",
 				// Command Line Einträge
-				ffmpegPfadCMD + "&&" + "ffmpeg -i " + inputFileCA + settingsFfmpeg + " 2> " + caOut.toString() + " &&"
-						+ ffmpegPfadCMD + "&&" + "ffmpeg -i " + inputFileKun + settingsFfmpeg + " 2> "
+				ffmpegPfadCMD + "&&" + "C:\\Users\\Daniel\\Desktop\\s2t\\ffmpegOrdner\\ffmpeg.exe -i " + inputFileCA + settingsFfmpeg + " 2> " + caOut.toString() + " &&"
+						+ ffmpegPfadCMD + "&&" + "C:\\Users\\Daniel\\Desktop\\s2t\\ffmpegOrdner\\ffmpeg.exe -i " + inputFileKun + settingsFfmpeg + " 2> "
 						+ kunOut.toString());
 
 		// Fehlermeldung der CMD weiterleiten an JAVA

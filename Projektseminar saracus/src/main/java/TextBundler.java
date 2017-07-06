@@ -6,15 +6,17 @@ public class TextBundler {
 	private String finalerOutputDialog; // Output, der in .txt-Datei eingebunden
 										// ist.
 	private Gson gson = new GsonBuilder().create(); // gsonBuilder
-	private GenerateUUID uuid = new GenerateUUID(); // Java-Klasse zum Erzeugen einer
-											// UUID.
+	private GenerateUUID uuid = new GenerateUUID(); // Java-Klasse zum Erzeugen
+													// einer
+	// UUID.
 	private ArrayList<Snippet> cuttedSnippetlist = new ArrayList<Snippet>();
 	private String uuidString;
 	private Gson gsonIn = new Gson(); // Gson-Element
 	private JsonElement fromGson; // Json-Input-Element mit Metadaten
-	private Snippet[] snippetlist; // Schnipselliste
+	private Snippet[] snippetArray; // Schnipselliste
 	private int counter = 0; // Counter zum befüllen des Arrays
 	private double audioLength;
+	private String cuttedFinalDialogue;
 
 	public TextBundler() {
 		uuidString = uuid.generiereStringID();
@@ -43,7 +45,8 @@ public class TextBundler {
 	/**
 	 * Strukturiert den Gespraechsoutput
 	 * 
-	 * @param s die Rolle mit Leerzeichen.
+	 * @param s
+	 *            die Rolle mit Leerzeichen.
 	 */
 	public void addGespraechsStruktur(String s) {
 		if (getFinalerOutputDialog() == null) {
@@ -73,14 +76,21 @@ public class TextBundler {
 	 * 
 	 * @param speicherdestination
 	 */
-	public void speichereDialoginTXT(String speicherdestination) {
+	public void speichereDialoginTXT(String speicherdestination, String idName) {
+		cuttedFinalDialogue = cutDialogue();
 
-		BufferedWriter out;
 		try {
-			out = new BufferedWriter(new FileWriter(speicherdestination + "\\gespraechsdialog.txt"));
+			// BufferedWriter out = new BufferedWriter(new
+			// FileWriter(speicherdestination + "\\" + idName + ".txt"));
+			//
+			// out.write(cuttedFinalDialogue);
+			// out.close();
 
-			out.write(getFinalerOutputDialog());
-			out.close();
+			Writer writer = new OutputStreamWriter(new FileOutputStream(speicherdestination + "\\" + idName + ".txt"),
+					"UTF-8");
+			writer.write(cuttedFinalDialogue);
+			writer.close();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -92,7 +102,7 @@ public class TextBundler {
 		String currentRole = cuttedSnippetlist.get(0).getRole();
 
 		for (int i = 1; i < cuttedSnippetlist.size(); i++) {
-			
+
 			System.out.println("identifySpeakerChanges" + i);
 
 			String newRole = cuttedSnippetlist.get(i).getRole();
@@ -102,6 +112,28 @@ public class TextBundler {
 			}
 		}
 		return speakerChanges;
+	}
+
+	public int identifySingleSpeakerOccurence(String role) {
+		// String opRole;
+		// if (role == "Agent") {
+		// opRole = "Customer";
+		// } else {
+		// opRole = "Agent";
+		// }
+		int speakerOccurence = 0;
+		// String start = cuttedSnippetlist.get(0).getRole();
+		if (cuttedSnippetlist.get(0).getRole().equals(role))
+			speakerOccurence += 1;
+		for (int i = 1; i < cuttedSnippetlist.size(); i++) {
+			String preCurrent = cuttedSnippetlist.get(i - 1).getRole();
+			String current = cuttedSnippetlist.get(i).getRole();
+			if (current == role && preCurrent != current) {
+				speakerOccurence += 1;
+
+			}
+		}
+		return speakerOccurence;
 	}
 
 	/**
@@ -115,10 +147,15 @@ public class TextBundler {
 	 *            die Input-Datei; besteht aus Metadaten, z.B. aus CRM-System
 	 */
 	public void generiereJSON(String filename, String fileDestination, String jsonInput) {
-		adaptSnippetlist();
 		int speakerChanges = identifySpeakerChanges();
 		String filenameWithEnding = filename + ".json";
-		DialogueData dialoguedata = new DialogueData(getAudioLength(), uuidString, speakerChanges);
+
+		double wordsPerAgent = getWordsPerSpeaker("Agent") / identifySingleSpeakerOccurence("Agent");
+		double wordsPerCustomer = getWordsPerSpeaker("Customer") / identifySingleSpeakerOccurence("Customer");
+		System.out.println("Agent" + wordsPerAgent + "Customer" + wordsPerCustomer);
+		// System.out.println("Customer" );
+		DialogueData dialoguedata = new DialogueData(getAudioLength(), uuidString, speakerChanges, wordsPerAgent,
+				wordsPerCustomer);
 
 		// System.out.println(konfidenzListenListe.getFirst().toString());
 		try {
@@ -142,9 +179,7 @@ public class TextBundler {
 			e.printStackTrace();
 		}
 		System.out.println(json);
-		counter = 0;
-		cuttedSnippetlist = null;
-		cuttedSnippetlist = new ArrayList<Snippet>();
+
 	}
 
 	/**
@@ -155,7 +190,7 @@ public class TextBundler {
 	 *            groeße des arrays.
 	 */
 	public void setSnippetListSize(int i) {
-		snippetlist = new Snippet[i];
+		snippetArray = new Snippet[i];
 	}
 
 	/**
@@ -165,11 +200,11 @@ public class TextBundler {
 	 * 
 	 * @return
 	 */
-	public ArrayList<Snippet> adaptSnippetlist() {
+	public void adaptSnippetlist() {
 		int idcounter = 0;
-		for (int i = 0; i < snippetlist.length; i++) {
-			if (snippetlist[i] != null && snippetlist[i].getTranscription() != null) {
-				cuttedSnippetlist.add(snippetlist[i]);
+		for (int i = 0; i < snippetArray.length; i++) {
+			if (snippetArray[i] != null && snippetArray[i].getTranscription() != null) {
+				cuttedSnippetlist.add(snippetArray[i]);
 				String idcounterString = String.valueOf(idcounter);
 				cuttedSnippetlist.get(idcounter)
 						.setSnippetId(uuidString + "-" + cuttedSnippetlist.get(idcounter).getRole() + idcounterString);
@@ -177,7 +212,6 @@ public class TextBundler {
 			}
 		}
 
-		return cuttedSnippetlist;
 	}
 
 	/**
@@ -194,8 +228,52 @@ public class TextBundler {
 	 *            um das richtige Ergebnishandelt (zwischen 0 und 1)
 	 */
 	public void addSnippet(String role, String transcript, double length, float confidence) {
-		snippetlist[counter] = new Snippet(role, transcript, length, confidence);
+		snippetArray[counter] = new Snippet(role, transcript, length, confidence);
+
+		// snippetlist[counter].countWords();
 		counter++;
 	}
 
+	public double getWordsPerSpeaker(String role) {
+		double wordsPerSpeaker = 0;
+		for (int i = 0; i < cuttedSnippetlist.size(); i++) {
+			if (cuttedSnippetlist.get(i).getRole().equals(role)) {
+				wordsPerSpeaker = wordsPerSpeaker + cuttedSnippetlist.get(i).getWordCount();
+
+			}
+		}
+		return wordsPerSpeaker;
+	}
+
+	public String cutDialogue() {
+		System.out.println("cutDialogue");
+		String finalString = null;
+		System.out.println(cuttedSnippetlist.size());
+		for (int i = 0; i < cuttedSnippetlist.size(); i++) {
+			if (cuttedSnippetlist.get(i).getRole().equals("Agent")) {
+				if (finalString == null) {
+					finalString = "Agent: " + cuttedSnippetlist.get(i).getTranscription() + "\n";
+				} else {
+					finalString = finalString + "Agent: " + cuttedSnippetlist.get(i).getTranscription() + "\n";
+				}
+			} else {
+				if (finalString == null) {
+					finalString = "Customer: " + cuttedSnippetlist.get(i).getTranscription() + "\n";
+				} else {
+
+					finalString = finalString + "Customer: " + cuttedSnippetlist.get(i).getTranscription() + "\n";
+				}
+			}
+		}
+		// TODO
+		// erstel null abfangen
+
+		return finalString;
+	}
+
+	public void reSetInitials() {
+		counter = 0;
+		cuttedSnippetlist = null;
+		cuttedSnippetlist = new ArrayList<Snippet>();
+	}
 }

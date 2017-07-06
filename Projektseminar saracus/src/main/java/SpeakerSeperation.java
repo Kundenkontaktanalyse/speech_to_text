@@ -50,12 +50,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  *  4: KU-Endzeiten = K2.txt
  *  
  *  
- *  TODO:
- *  - input datei beim schneiden löschen (UNNÖTIG? JA!)
- *  - cutMethode ins gesamtsystem einbetten / KONTROLLIEREN!
- *  - identifyStarter 0.0 fixen (leere sekunden einfügen vor beiden channeln) oder (??) vergleich anzahl start und endzeiten: siehe todo2
- *    falls mehr endzeiten pro channel als startzeiten -> start fehlt ABER: falls keine stille am ende des gesprächs endzeitenanzahl = -1!! (egal?)
- *  - textbundler outputdestination dynamisch machen
  *  
  */
 
@@ -63,37 +57,45 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class SpeakerSeperation extends AudioProcessing {
 
-	File lokalFfmpegFile;
-	File lokalFfmpegParentDirectory;
-	File[] audioChannels;
-	File[] audiofiles;
-	File[] audiofilesKU;
-	File[] audiofilesCA;
-	File[] textfiles;
+	
+	private File gespraechsOrdner;
+	private File temp;
+	private String idName;
+	private File[] audioChannels;
+	private File[] audiofiles;
+	private File[] audiofilesKU;
+	private File[] audiofilesCA;
+	private File[] textfiles;
 	// arrays zum updaten, eigentlich besser mit listen umsetzbar...
-	double[] startzeitenKU;
-	double[] startzeitenCA;
-	double[] endzeitenKU;
-	double[] endzeitenCA;
-	double[] startzeitenKUrdy;
-	double[] startzeitenCArdy;
-	double[] endzeitenKUrdy;
-	double[] endzeitenCArdy;
-	double audioLength;
+	private double[] startzeitenKU;
+	private double[] startzeitenCA;
+	private double[] endzeitenKU;
+	private double[] endzeitenCA;
+	private double[] startzeitenKUrdy;
+	private double[] startzeitenCArdy;
+	private double[] endzeitenKUrdy;
+	private double[] endzeitenCArdy;
+	private double audioLength;
+	private double puffer = 0.3;
 
-	public SpeakerSeperation(File lokalFfmpegFile) {
-		this.lokalFfmpegFile = lokalFfmpegFile;
+	public SpeakerSeperation(File gespraechsOrdner, File temp, String idName) {
+		this.gespraechsOrdner = gespraechsOrdner;
+		this.temp = temp;
+		this.idName = idName;
+
 	}
 
 	// Methode zum Schneiden von AudioDateien: Legt die AudioSchnitte im
 	// Verzeichnis der Audiodatei ab
-	// Bennennung der Dateien mit originalNamen + 00X für Anzahl
 	public void cutAudio(File audioSource, double[] startzeiten, double[] endzeiten, char channel) {
+	// Bennennung der Dateien mit originalNamen + 00X für Anzahl
 	       
         System.out.println("cutAudio:");
  
         String sourceFilePath = audioSource.getPath().toString();
-        String destinationFilePath = sourceFilePath;
+        String destinationFilePath = temp.getPath();
+
+             
         AudioInputStream inputStream = null;
         AudioInputStream shortenedStream = null;
         int AnzahlSchnitte = startzeiten.length;
@@ -169,7 +171,8 @@ public class SpeakerSeperation extends AudioProcessing {
        
         // anpassung der Zeiten in den Arrays durch Puffer, ffmpeg einstellung silenceduration = 1s -> stille kann nur am anfang
         // kleiner sein.
-        double puffer = 0.3;
+
+      
        
         if (längeSkipsSekunden[0] > puffer){
         längeSkipsSekunden[0] = längeSkipsSekunden[0] - puffer;
@@ -255,7 +258,8 @@ public class SpeakerSeperation extends AudioProcessing {
 //              System.out.println((long) (framesOfAudioToCopy));
                
  
-                int pfadlaenge = destinationFilePath.length();
+//                int pfadlaenge = destinationFilePath.length();
+                int namenlaenge = audioSource.getName().length();
  
                 String insert = null;
                 if (i < 10) {
@@ -268,13 +272,14 @@ public class SpeakerSeperation extends AudioProcessing {
                     }
  
                 }
-                destinationFilePath = destinationFilePath.substring(0, pfadlaenge - 4) + insert + i
-                        + destinationFilePath.substring(pfadlaenge - 4, pfadlaenge);
+//                destinationFilePath = destinationFilePath.substring(0, pfadlaenge - 4) + insert + i
+//                        + destinationFilePath.substring(pfadlaenge - 4, pfadlaenge);
+                destinationFilePath = destinationFilePath + "\\" + audioSource.getName().substring(0, namenlaenge - 4) + insert + i
+                		+ audioSource.getName().substring(namenlaenge - 4, namenlaenge);
  
                 File destinationFile = new File(destinationFilePath);
                 AudioSystem.write(shortenedStream, fileFormat.getType(), destinationFile);
  
-               
                
                
  
@@ -306,22 +311,23 @@ public class SpeakerSeperation extends AudioProcessing {
 	 * Methode zum Verarbeiten der Input-Dateien: Dateien werden nach Audio und
 	 * Text gefiltert und in jeweilige Arrays abgelegt
 	 */
-	public File[] getAudioFilesToArray() {
+	public File[] getAudioFilesToArray(String idName, File audioDirectory) {
 		
 		System.out.println("getAudioFilesToArray:");
 
-		lokalFfmpegParentDirectory = lokalFfmpegFile.getParentFile();
 
 		// Filter zur kontrolle ob Datei mit .wav endet
 		class AudioFilter implements FileFilter {
 			@Override
 			public boolean accept(File file) {
-				return file.getName().endsWith(".wav");
+				return file.getName().endsWith(".wav") && file.getName().startsWith(idName);
 			}
 		}
 
+		
+		
 		// Ablage aller Audiodateien des Verzeichnisses in audiofiles[]
-		File[] files = lokalFfmpegParentDirectory.listFiles(new AudioFilter());
+		File[] files = audioDirectory.listFiles(new AudioFilter());
 		Arrays.sort(files);
 
 		// for (int i = 0; i < audiofiles.length; i++) {
@@ -339,7 +345,6 @@ public class SpeakerSeperation extends AudioProcessing {
 
 	public void getTextFilesToArray() {
 
-		lokalFfmpegParentDirectory = lokalFfmpegFile.getParentFile();
 
 		
 		System.out.println("getTextFilesToArray:");
@@ -352,7 +357,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		}
 
 		// Ablage aller Textdateien des Verzeichnisses in textfiles[]
-		textfiles = lokalFfmpegParentDirectory.listFiles(new TextFilter());
+		textfiles = temp.listFiles(new TextFilter());
 		Arrays.sort(textfiles);
 
 //		 for (int i = 0; i < textfiles.length; i++) {
@@ -456,10 +461,10 @@ public class SpeakerSeperation extends AudioProcessing {
 		getTextFilesToArray();
 		getTimeArrays();
 		prepareTimes();
-		audioChannels = getAudioFilesToArray();
+		audioChannels = getAudioFilesToArray(idName, gespraechsOrdner);
 		cutAudio(audioChannels[0], startzeitenCArdy, endzeitenCArdy, 'C');
 		cutAudio(audioChannels[1], startzeitenKUrdy, endzeitenKUrdy, 'K');
-		audiofiles = getAudioFilesToArray();
+		audiofiles = getAudioFilesToArray(idName, temp);
 
 		splitSpeaker();
 
@@ -582,7 +587,9 @@ public class SpeakerSeperation extends AudioProcessing {
 	// audioFiles[] wird aufgeteilt in audiofilesKU und audiofilesCA
 	public void splitSpeaker() {
 
+		audiofilesKU = null;
 		audiofilesKU = new File[startzeitenKUrdy.length];
+		audiofilesCA = null;
 		audiofilesCA = new File[startzeitenCArdy.length];
 		int insertIntoKU = 0;
 		int insertIntoCA = 0;
@@ -642,13 +649,13 @@ public class SpeakerSeperation extends AudioProcessing {
 	 * auskommentierte Syso's kontrolliert.
 	 * 
 	 */
-	public void processFiles(String speicherdestination) throws IOException {
+	public void processFiles() throws IOException {
 
 		initalizeData();
 		System.out.println("Beginn processFiles:");
         System.out.println("---------------------------------------------");
-		bundler.setSnippetListSize(audiofiles.length-2);
-		System.out.println("SnippetSize:" + (audiofiles.length-2));
+		bundler.setSnippetListSize(audiofiles.length);
+		System.out.println("SnippetSize:" + (audiofiles.length));
 
 		// Idee eines Stack:
 		// Zeiger auf jeweiligen Feldern, "abnehmen" des aktuellsten Elemts
@@ -667,7 +674,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		for (int i = 0; i < (audiofilesKU.length + audiofilesCA.length); i++) {
 			if ((startzeitenKUrdy[currentPositionKU] <= startzeitenCArdy[currentPositionCA]) || (CAfinished)) {
 				bundler.addGespraechsStruktur("\n Kunde:  " + currentPositionKU);
-				processAudio(audiofilesKU[currentPositionKU], "Customer");
+				processAudio(audiofilesKU[currentPositionKU], "Customer", puffer);
 
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
 					currentPositionKU++;
@@ -678,7 +685,7 @@ public class SpeakerSeperation extends AudioProcessing {
 			} else {
 				if ((startzeitenCArdy[currentPositionCA] <= startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
 					bundler.addGespraechsStruktur("\n Agent:  " + currentPositionCA);
-					processAudio(audiofilesCA[currentPositionCA], "Agent");
+					processAudio(audiofilesCA[currentPositionCA], "Agent", puffer);
 
 					if (currentPositionCA < startzeitenCArdy.length - 1) {
 						currentPositionCA++;
@@ -691,5 +698,13 @@ public class SpeakerSeperation extends AudioProcessing {
 			}
 		}
 
+	}
+	
+	public double getAudioLength(){
+		return audioLength;
+	}
+	
+	public double getPuffer(){
+		return puffer;
 	}
 }
