@@ -13,13 +13,13 @@ public class TextBundler {
 	private String uuidString;
 	private Gson gsonIn = new Gson(); // Gson-Element
 	private JsonElement fromGson; // Json-Input-Element mit Metadaten
-	private Snippet[] snippetArray; // Schnipselliste
+	private Snippet[] snippetlist; // Schnipselliste
 	private int counter = 0; // Counter zum befüllen des Arrays
 	private double audioLength;
 	private String cuttedFinalDialogue;
 
-	public TextBundler() {
-		uuidString = uuid.generiereStringID();
+	public TextBundler(String uuidString) {
+		this.uuidString = uuidString;
 	}
 	/*
 	 * Getter- und Setter-Methoden
@@ -56,41 +56,36 @@ public class TextBundler {
 		}
 	}
 
-	/**
-	 * Fügt Text für den txt-Output hinzu.
-	 * 
-	 * @param a
-	 *            der transkribierte Text.
-	 */
-	public void addTextSync(String a) {
+//	/**
+//	 * Fügt Text für den txt-Output hinzu.
+//	 * 
+//	 * @param a
+//	 *            der transkribierte Text.
+//	 */
+//	public void addTextSync(String a) {
+//
+//		if (getFinalerOutputDialog() == null) {
+//			setFinalerOutputDialog(a);
+//		} else {
+//			setFinalerOutputDialog(getFinalerOutputDialog() + a);
+//		}
+//	}
 
-		if (getFinalerOutputDialog() == null) {
-			setFinalerOutputDialog(a);
-		} else {
-			setFinalerOutputDialog(getFinalerOutputDialog() + " " + a);
-		}
-	}
-
-	/**
-	 * speichert das Telefongespraech in einer .txt Datei.
-	 * 
-	 * @param speicherdestination
-	 */
+	
 	public void speichereDialoginTXT(String speicherdestination, String idName) {
 		cuttedFinalDialogue = cutDialogue();
-
+		
 		try {
-			// BufferedWriter out = new BufferedWriter(new
-			// FileWriter(speicherdestination + "\\" + idName + ".txt"));
-			//
-			// out.write(cuttedFinalDialogue);
-			// out.close();
-
+//			BufferedWriter out = new BufferedWriter(new FileWriter(speicherdestination + "\\" + idName + ".txt"));
+//
+//			out.write(cuttedFinalDialogue);
+//			out.close();
+			
 			Writer writer = new OutputStreamWriter(new FileOutputStream(speicherdestination + "\\" + idName + ".txt"),
 					"UTF-8");
 			writer.write(cuttedFinalDialogue);
 			writer.close();
-
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -147,15 +142,19 @@ public class TextBundler {
 	 *            die Input-Datei; besteht aus Metadaten, z.B. aus CRM-System
 	 */
 	public void generiereJSON(String filename, String fileDestination, String jsonInput) {
+//		adaptSnippetlist();
+//		addStartingTimeToSnippet();
 		int speakerChanges = identifySpeakerChanges();
 		String filenameWithEnding = filename + ".json";
 
-		double wordsPerAgent = getWordsPerSpeaker("Agent") / identifySingleSpeakerOccurence("Agent");
-		double wordsPerCustomer = getWordsPerSpeaker("Customer") / identifySingleSpeakerOccurence("Customer");
-		System.out.println("Agent" + wordsPerAgent + "Customer" + wordsPerCustomer);
-		// System.out.println("Customer" );
-		DialogueData dialoguedata = new DialogueData(getAudioLength(), uuidString, speakerChanges, wordsPerAgent,
-				wordsPerCustomer);
+		double wordsPerAgentFragment = getWordsPerSpeaker("Agent") / identifySingleSpeakerOccurence("Agent");
+		double wordsPerCustomerFragment = getWordsPerSpeaker("Customer") / identifySingleSpeakerOccurence("Customer");
+
+		DialogueData dialoguedata = new DialogueData(getAudioLength(), uuidString, speakerChanges,
+				getWordsPerSpeaker("Agent"), getWordsPerSpeaker("Customer"), wordsPerAgentFragment,
+				wordsPerCustomerFragment, identifySingleSpeakerOccurence("Agent"),
+				identifySingleSpeakerOccurence("Customer"), getSpeechTimeSinglePerson("Agent"),
+				getSpeechTimeSinglePerson("Customer"));
 
 		// System.out.println(konfidenzListenListe.getFirst().toString());
 		try {
@@ -179,7 +178,9 @@ public class TextBundler {
 			e.printStackTrace();
 		}
 		System.out.println(json);
-
+//		counter = 0;
+//		cuttedSnippetlist = null;
+//		cuttedSnippetlist = new ArrayList<Snippet>();
 	}
 
 	/**
@@ -190,7 +191,7 @@ public class TextBundler {
 	 *            groeße des arrays.
 	 */
 	public void setSnippetListSize(int i) {
-		snippetArray = new Snippet[i];
+		snippetlist = new Snippet[i];
 	}
 
 	/**
@@ -200,11 +201,11 @@ public class TextBundler {
 	 * 
 	 * @return
 	 */
-	public void adaptSnippetlist() {
+	public ArrayList<Snippet> adaptSnippetlist() {
 		int idcounter = 0;
-		for (int i = 0; i < snippetArray.length; i++) {
-			if (snippetArray[i] != null && snippetArray[i].getTranscription() != null) {
-				cuttedSnippetlist.add(snippetArray[i]);
+		for (int i = 0; i < snippetlist.length; i++) {
+			if (snippetlist[i] != null && snippetlist[i].getTranscription() != null) {
+				cuttedSnippetlist.add(snippetlist[i]);
 				String idcounterString = String.valueOf(idcounter);
 				cuttedSnippetlist.get(idcounter)
 						.setSnippetId(uuidString + "-" + cuttedSnippetlist.get(idcounter).getRole() + idcounterString);
@@ -212,6 +213,7 @@ public class TextBundler {
 			}
 		}
 
+		return cuttedSnippetlist;
 	}
 
 	/**
@@ -228,7 +230,7 @@ public class TextBundler {
 	 *            um das richtige Ergebnishandelt (zwischen 0 und 1)
 	 */
 	public void addSnippet(String role, String transcript, double length, float confidence) {
-		snippetArray[counter] = new Snippet(role, transcript, length, confidence);
+		snippetlist[counter] = new Snippet(role, transcript, length, confidence);
 
 		// snippetlist[counter].countWords();
 		counter++;
@@ -245,6 +247,30 @@ public class TextBundler {
 		return wordsPerSpeaker;
 	}
 
+	public double getSpeechTimeSinglePerson(String role) {
+		double speechTime = 0;
+		for (int i = 0; i < cuttedSnippetlist.size(); i++) {
+			if (cuttedSnippetlist.get(i).getRole() == role) {
+				speechTime = speechTime + cuttedSnippetlist.get(i).getLenght();
+			}
+		}
+		return speechTime;
+	}
+	
+	public void addStartingTimeToSnippet (){
+	double counterInSeconds=0;
+	int timeInMin=0;
+	int timeInSec=0;
+	String timeMinSec;
+	
+	for(int i=0; i<cuttedSnippetlist.size();i++){
+		timeInMin=(int)counterInSeconds/60;
+		timeInSec=(int)counterInSeconds%60;
+		timeMinSec=(timeInMin+ ":"+timeInSec);
+	cuttedSnippetlist.get(i).setStartingTimeMinSec(timeMinSec);
+	counterInSeconds=counterInSeconds+cuttedSnippetlist.get(i).getLenght();
+	}
+	}
 	public String cutDialogue() {
 		System.out.println("cutDialogue");
 		String finalString = null;
@@ -270,10 +296,11 @@ public class TextBundler {
 
 		return finalString;
 	}
-
-	public void reSetInitials() {
+	
+	public void reSetInitials(){
 		counter = 0;
 		cuttedSnippetlist = null;
 		cuttedSnippetlist = new ArrayList<Snippet>();
 	}
+
 }

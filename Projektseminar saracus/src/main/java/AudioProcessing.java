@@ -25,15 +25,19 @@ import com.google.protobuf.ByteString;
 // Aufteilung funktioniert 
 
 
-class AudioProcessing extends FileChooser {	
-	static TextBundler bundler= new TextBundler();
+class AudioProcessing {	
 	String sourceFileName;
 	int sampleRate;
 	double dauerges;
 	String role;
 	String transcript;
 	float confidence;
+	private TextBundler myBundler;
 	
+	
+	public AudioProcessing(TextBundler myBundler){
+		this.myBundler = myBundler;
+	}
 	
 	public void recognize(String fileName) throws Exception, IOException {
 		 
@@ -73,9 +77,9 @@ class AudioProcessing extends FileChooser {
 		    	
 		    	if(transcript==null){transcript=alternative.getTranscript();
 		    	}
-		    	else transcript=transcript+ alternative.getTranscript();
+		    	else transcript=transcript + " " +alternative.getTranscript() ;
 		    	confidence=confidence+alternative.getConfidence();
-		      bundler.addTextSync(alternative.getTranscript());
+//		      bundler.addTextSync(alternative.getTranscript() + "");
 		      System.out.println(alternative.getConfidence());
 		    }
 		  }
@@ -149,8 +153,13 @@ class AudioProcessing extends FileChooser {
 				File destinationFile = new File(destinationFileName);
 				AudioSystem.write(shortenedStream, fileFormat.getType(), destinationFile);
 				this.recognize(destinationFileName);
+//				bundler.addTextSync("HEEEEEEEYYYYYYYYYYYYAAAAAAAAAAAAAAa");
 				destinationFile.delete();			
-				
+				System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx");
+				System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx");
+				System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx");
+				System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx");
+				System.out.println(AnzahlSchnitte);
 
 			}
 
@@ -171,7 +180,7 @@ class AudioProcessing extends FileChooser {
 				}
 		}
 		System.out.println("role"+role+ " Tra:" + transcript);
-		bundler.addSnippet(role, transcript, dauerges - 2*puffer, (confidence/((int)(dauerges/15)+1)));
+		myBundler.addSnippet(role, transcript, dauerges - 2*puffer, (confidence/((int)(dauerges/15)+1)));
 		transcript=null;
 		confidence=0;
 //		bundler.generiereJSON();

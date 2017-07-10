@@ -4,7 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-public class test extends FileChooser {
+public class test {
 
 	public static void main(String[] args) throws IOException {
 		File oldNameDirectory = new File("C:\\Users\\Daniel\\Desktop\\s2t\\Gespraeche\\Gespraech03");

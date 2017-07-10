@@ -20,19 +20,17 @@ import java.util.Properties;
 
 // Klasse zum Verwalten der Files im Verzeichnis und Aufrufen der Übersetzung ermittelter Json-Agent-Kunde Tripels
 
-public class SpeechToText extends AudioProcessing {
+public class SpeechToText {
 
 	public void invokeTranslation(String outputDestination, File jsonInput, File caInput, File kunInput,
 			File gespraechsOrdner, File temp, File localFfmpegFile) throws IOException {
 
+		
+		
 		System.out.println("invokeTranslation");
 
 		String idName = gespraechsOrdner.getName();
-
-		Properties properties = new Properties();
-		BufferedInputStream stream = new BufferedInputStream(new FileInputStream("s2tProperties.properties"));
-		properties.load(stream);
-		stream.close();
+		TextBundler myBundler = new TextBundler(idName);
 
 		// FileChooser myChooser = new FileChooser();
 
@@ -44,19 +42,19 @@ public class SpeechToText extends AudioProcessing {
 		// ----------------------------------------------------------------
 
 		manageJavaInput MyManage = new manageJavaInput();
-		MyManage.manage(temp.toString(), ffmpegExeOrdner, caInput, kunInput);
+		MyManage.manage(temp.toString(), ffmpegExeOrdner, caInput, kunInput, idName);
 
 		// ----------------------------------------------------------------
 
-		SpeakerSeperation spsep = new SpeakerSeperation(gespraechsOrdner, temp, idName);
+		SpeakerSeperation spsep = new SpeakerSeperation(gespraechsOrdner, temp, idName, myBundler);
 		spsep.processFiles();
 		// spsep.initalizeData();
 
-		bundler.setAudioLength(spsep.getAudioLength());
-		bundler.adaptSnippetlist();
-		bundler.speichereDialoginTXT(outputDestination, idName);
-		bundler.generiereJSON(idName, outputDestination, jsonInputPath);
-		bundler.reSetInitials();
+		myBundler.setAudioLength(spsep.getAudioLength());
+		myBundler.adaptSnippetlist();
+		myBundler.speichereDialoginTXT(outputDestination, idName);
+		myBundler.generiereJSON(idName, outputDestination, jsonInputPath);
+		myBundler.reSetInitials();
 
 	}
 }

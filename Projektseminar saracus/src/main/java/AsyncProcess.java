@@ -15,7 +15,7 @@ public class AsyncProcess {
 
 	public void asyncRecognizeGcs(String gcsUri) throws Exception, IOException {
 		
-		TextBundler bundler=new TextBundler();
+//		TextBundler bundler=new TextBundler();
 		  // Instantiates a client with GOOGLE_APPLICATION_CREDENTIALS
 		  SpeechClient speech = SpeechClient.create();
 

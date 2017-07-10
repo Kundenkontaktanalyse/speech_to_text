@@ -4,9 +4,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
 import java.util.Properties;
 
-public class Verzeichnismanager extends FileChooser {
+public class Verzeichnismanager {
 
 	public static void main(String... args) throws Exception {
 
@@ -35,7 +36,7 @@ public class Verzeichnismanager extends FileChooser {
 		// Outputordner auf gespraechsVerzeichnis-ebene erstellen
 		File output = new File(gespraechsUeberVerzeichnis + "\\output");
 		output.mkdir();
-
+		
 //		String[] translatedDailogIdNames = getTranslatedDialogIdNames(output);
 //		setIdToNewFiles(translatedDailogIdNames, gespraechsOrdnerArray, gespraechsOrdnerVerzeichnis);
 
@@ -63,7 +64,7 @@ public class Verzeichnismanager extends FileChooser {
 			if (checkTranslated(gespraechsOrdnerArray[i].getName(), translatedDailogIdNames)) {
 				System.out.println("Gespraech bereits transkribiert");
 			}
-			;
+			
 
 			if (!checkTranslated(gespraechsOrdnerArray[i].getName(), translatedDailogIdNames)) {
 				System.out.println(gespraechsOrdnerArray[i].getPath());
@@ -75,7 +76,7 @@ public class Verzeichnismanager extends FileChooser {
 				for (int j = 0; j < gespraechsDateien.length; j++) {
 					System.out.println(gespraechsDateien[j]);
 				}
-
+				Arrays.sort(gespraechsDateien);
 				mySpeechToText.invokeTranslation(output.toString(), gespraechsDateien[1], gespraechsDateien[2],
 						gespraechsDateien[3], gespraechsOrdnerArray[i], temp, lokalFfmpeg);
 			}
@@ -84,7 +85,7 @@ public class Verzeichnismanager extends FileChooser {
 	}
 
 	@SuppressWarnings("resource")
-	public static void copyFile(File in, File out) throws IOException {
+	public void copyFile(File in, File out) throws IOException {
 		FileChannel inChannel = null;
 		FileChannel outChannel = null;
 		try {
@@ -168,7 +169,7 @@ public class Verzeichnismanager extends FileChooser {
 			// Kontrolle ob bereits transkribiert
 			if (!checkTranslated(gespraechsOrdnerArray[i].getName(), translatedDailogIdNames)) {
 
-				// TODO
+			
 				GenerateUUID newIDgenerator = new GenerateUUID();
 				String newId = newIDgenerator.generiereStringID();
 				

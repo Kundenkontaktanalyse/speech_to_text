@@ -55,7 +55,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 
 
-public class SpeakerSeperation extends AudioProcessing {
+public class SpeakerSeperation {
 
 	
 	private File gespraechsOrdner;
@@ -77,12 +77,15 @@ public class SpeakerSeperation extends AudioProcessing {
 	private double[] endzeitenCArdy;
 	private double audioLength;
 	private double puffer = 0.3;
+	private TextBundler myBundler;
+	private AudioProcessing myAudioProcess;
 
-	public SpeakerSeperation(File gespraechsOrdner, File temp, String idName) {
+	public SpeakerSeperation(File gespraechsOrdner, File temp, String idName, TextBundler myBundler) {
 		this.gespraechsOrdner = gespraechsOrdner;
 		this.temp = temp;
 		this.idName = idName;
-
+		this.myBundler = myBundler;
+		myAudioProcess = new AudioProcessing(myBundler);
 	}
 
 	// Methode zum Schneiden von AudioDateien: Legt die AudioSchnitte im
@@ -311,7 +314,7 @@ public class SpeakerSeperation extends AudioProcessing {
 	 * Methode zum Verarbeiten der Input-Dateien: Dateien werden nach Audio und
 	 * Text gefiltert und in jeweilige Arrays abgelegt
 	 */
-	public File[] getAudioFilesToArray(String idName, File audioDirectory) {
+	public File[] getAudioFilesToArray(File audioDirectory) {
 		
 		System.out.println("getAudioFilesToArray:");
 
@@ -352,7 +355,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		class TextFilter implements FileFilter {
 			@Override
 			public boolean accept(File file) {
-				return file.getName().endsWith(".txt");
+				return file.getName().endsWith(".txt") && file.getName().startsWith(idName);
 			}
 		}
 
@@ -461,10 +464,10 @@ public class SpeakerSeperation extends AudioProcessing {
 		getTextFilesToArray();
 		getTimeArrays();
 		prepareTimes();
-		audioChannels = getAudioFilesToArray(idName, gespraechsOrdner);
+		audioChannels = getAudioFilesToArray(gespraechsOrdner);
 		cutAudio(audioChannels[0], startzeitenCArdy, endzeitenCArdy, 'C');
 		cutAudio(audioChannels[1], startzeitenKUrdy, endzeitenKUrdy, 'K');
-		audiofiles = getAudioFilesToArray(idName, temp);
+		audiofiles = getAudioFilesToArray(temp);
 
 		splitSpeaker();
 
@@ -654,7 +657,7 @@ public class SpeakerSeperation extends AudioProcessing {
 		initalizeData();
 		System.out.println("Beginn processFiles:");
         System.out.println("---------------------------------------------");
-		bundler.setSnippetListSize(audiofiles.length);
+		myBundler.setSnippetListSize(audiofiles.length);
 		System.out.println("SnippetSize:" + (audiofiles.length));
 
 		// Idee eines Stack:
@@ -673,8 +676,8 @@ public class SpeakerSeperation extends AudioProcessing {
 
 		for (int i = 0; i < (audiofilesKU.length + audiofilesCA.length); i++) {
 			if ((startzeitenKUrdy[currentPositionKU] <= startzeitenCArdy[currentPositionCA]) || (CAfinished)) {
-				bundler.addGespraechsStruktur("\n Kunde:  " + currentPositionKU);
-				processAudio(audiofilesKU[currentPositionKU], "Customer", puffer);
+				myBundler.addGespraechsStruktur("\n Kunde:  " + currentPositionKU);
+				myAudioProcess.processAudio(audiofilesKU[currentPositionKU], "Customer", puffer);
 
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
 					currentPositionKU++;
@@ -684,8 +687,8 @@ public class SpeakerSeperation extends AudioProcessing {
 				}
 			} else {
 				if ((startzeitenCArdy[currentPositionCA] <= startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
-					bundler.addGespraechsStruktur("\n Agent:  " + currentPositionCA);
-					processAudio(audiofilesCA[currentPositionCA], "Agent", puffer);
+					myBundler.addGespraechsStruktur("\n Agent:  " + currentPositionCA);
+					myAudioProcess.processAudio(audiofilesCA[currentPositionCA], "Agent", puffer);
 
 					if (currentPositionCA < startzeitenCArdy.length - 1) {
 						currentPositionCA++;

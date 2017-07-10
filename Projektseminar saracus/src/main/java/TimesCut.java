@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class TimesCut extends FileChooser {
+public class TimesCut {
 
 	public void identifyStartTimes(File inputfile, File outputdestination) {
 
@@ -16,20 +16,26 @@ public class TimesCut extends FileChooser {
 			bReader = new BufferedReader(new FileReader(inputfile));
 		
 		BufferedWriter out = new BufferedWriter(new FileWriter(outputdestination));
-
 		while (true) {
 			String Zeile = bReader.readLine();
+			
+//			System.out.println(Zeile);
 			if (Zeile == null) {
 				break;
 			}
+			if(Zeile != null){
+				
 			if (Zeile.contains("silence_end")) {
 				int indexDoppelpunkt = Zeile.indexOf(":") + 1;
 				int indexSonderzeichen = Zeile.indexOf("|") - 1;
 				Zeile = Zeile.substring(indexDoppelpunkt, indexSonderzeichen);
 				Zeile.replaceAll("[^.0-9" + "]", "");
+				System.out.println(Zeile);
 				out.write(Zeile);
 			}
-		}
+			}
+
+				}
 		out.close();
 		bReader.close();
 		
