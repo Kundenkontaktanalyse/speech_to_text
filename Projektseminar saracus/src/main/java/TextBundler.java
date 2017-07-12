@@ -3,12 +3,9 @@ import com.google.gson.*;
 import java.util.ArrayList;
 
 public class TextBundler {
-	private String finalerOutputDialog; // Output, der in .txt-Datei eingebunden
-										// ist.
+
 	private Gson gson = new GsonBuilder().create(); // gsonBuilder
-	private GenerateUUID uuid = new GenerateUUID(); // Java-Klasse zum Erzeugen
-													// einer
-	// UUID.
+
 	private ArrayList<Snippet> cuttedSnippetlist = new ArrayList<Snippet>();
 	private String uuidString;
 	private Gson gsonIn = new Gson(); // Gson-Element
@@ -26,14 +23,6 @@ public class TextBundler {
 	 *
 	 */
 
-	public String getFinalerOutputDialog() {
-		return finalerOutputDialog;
-	}
-
-	public void setFinalerOutputDialog(String finalerOutputDialog) {
-		this.finalerOutputDialog = finalerOutputDialog;
-	}
-
 	public double getAudioLength() {
 		return audioLength;
 	}
@@ -42,50 +31,36 @@ public class TextBundler {
 		this.audioLength = audioLength;
 	}
 
-	/**
-	 * Strukturiert den Gespraechsoutput
-	 * 
-	 * @param s
-	 *            die Rolle mit Leerzeichen.
-	 */
-	public void addGespraechsStruktur(String s) {
-		if (getFinalerOutputDialog() == null) {
-			setFinalerOutputDialog("\n" + s);
-		} else {
-			setFinalerOutputDialog(getFinalerOutputDialog() + "\n" + " " + s);
-		}
-	}
+	// /**
+	// * Fügt Text für den txt-Output hinzu.
+	// *
+	// * @param a
+	// * der transkribierte Text.
+	// */
+	// public void addTextSync(String a) {
+	//
+	// if (getFinalerOutputDialog() == null) {
+	// setFinalerOutputDialog(a);
+	// } else {
+	// setFinalerOutputDialog(getFinalerOutputDialog() + a);
+	// }
+	// }
 
-//	/**
-//	 * Fügt Text für den txt-Output hinzu.
-//	 * 
-//	 * @param a
-//	 *            der transkribierte Text.
-//	 */
-//	public void addTextSync(String a) {
-//
-//		if (getFinalerOutputDialog() == null) {
-//			setFinalerOutputDialog(a);
-//		} else {
-//			setFinalerOutputDialog(getFinalerOutputDialog() + a);
-//		}
-//	}
-
-	
 	public void speichereDialoginTXT(String speicherdestination, String idName) {
 		cuttedFinalDialogue = cutDialogue();
-		
+
 		try {
-//			BufferedWriter out = new BufferedWriter(new FileWriter(speicherdestination + "\\" + idName + ".txt"));
-//
-//			out.write(cuttedFinalDialogue);
-//			out.close();
-			
+			// BufferedWriter out = new BufferedWriter(new
+			// FileWriter(speicherdestination + "\\" + idName + ".txt"));
+			//
+			// out.write(cuttedFinalDialogue);
+			// out.close();
+
 			Writer writer = new OutputStreamWriter(new FileOutputStream(speicherdestination + "\\" + idName + ".txt"),
 					"UTF-8");
 			writer.write(cuttedFinalDialogue);
 			writer.close();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -142,8 +117,8 @@ public class TextBundler {
 	 *            die Input-Datei; besteht aus Metadaten, z.B. aus CRM-System
 	 */
 	public void generiereJSON(String filename, String fileDestination, String jsonInput) {
-//		adaptSnippetlist();
-//		addStartingTimeToSnippet();
+		// adaptSnippetlist();
+		// addStartingTimeToSnippet();
 		int speakerChanges = identifySpeakerChanges();
 		String filenameWithEnding = filename + ".json";
 
@@ -178,9 +153,9 @@ public class TextBundler {
 			e.printStackTrace();
 		}
 		System.out.println(json);
-//		counter = 0;
-//		cuttedSnippetlist = null;
-//		cuttedSnippetlist = new ArrayList<Snippet>();
+		// counter = 0;
+		// cuttedSnippetlist = null;
+		// cuttedSnippetlist = new ArrayList<Snippet>();
 	}
 
 	/**
@@ -256,21 +231,22 @@ public class TextBundler {
 		}
 		return speechTime;
 	}
-	
-	public void addStartingTimeToSnippet (){
-	double counterInSeconds=0;
-	int timeInMin=0;
-	int timeInSec=0;
-	String timeMinSec;
-	
-	for(int i=0; i<cuttedSnippetlist.size();i++){
-		timeInMin=(int)counterInSeconds/60;
-		timeInSec=(int)counterInSeconds%60;
-		timeMinSec=(timeInMin+ ":"+timeInSec);
-	cuttedSnippetlist.get(i).setStartingTimeMinSec(timeMinSec);
-	counterInSeconds=counterInSeconds+cuttedSnippetlist.get(i).getLenght();
+
+	public void addStartingTimeToSnippet() {
+		double counterInSeconds = 0;
+		int timeInMin = 0;
+		int timeInSec = 0;
+		String timeMinSec;
+
+		for (int i = 0; i < cuttedSnippetlist.size(); i++) {
+			timeInMin = (int) counterInSeconds / 60;
+			timeInSec = (int) counterInSeconds % 60;
+			timeMinSec = (timeInMin + ":" + timeInSec);
+			cuttedSnippetlist.get(i).setStartingTimeMinSec(timeMinSec);
+			counterInSeconds = counterInSeconds + cuttedSnippetlist.get(i).getLenght();
+		}
 	}
-	}
+
 	public String cutDialogue() {
 		System.out.println("cutDialogue");
 		String finalString = null;
@@ -291,13 +267,12 @@ public class TextBundler {
 				}
 			}
 		}
-		// TODO
-		// erstel null abfangen
+		
 
 		return finalString;
 	}
-	
-	public void reSetInitials(){
+
+	public void reSetInitialsBundler() {
 		counter = 0;
 		cuttedSnippetlist = null;
 		cuttedSnippetlist = new ArrayList<Snippet>();

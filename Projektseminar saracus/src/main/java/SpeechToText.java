@@ -21,6 +21,11 @@ import java.util.Properties;
 // Klasse zum Verwalten der Files im Verzeichnis und Aufrufen der Übersetzung ermittelter Json-Agent-Kunde Tripels
 
 public class SpeechToText {
+	private String translator;
+	
+	public SpeechToText(String translator){
+		this.translator = translator;
+	}
 
 	public void invokeTranslation(String outputDestination, File jsonInput, File caInput, File kunInput,
 			File gespraechsOrdner, File temp, File localFfmpegFile) throws IOException {
@@ -46,7 +51,7 @@ public class SpeechToText {
 
 		// ----------------------------------------------------------------
 
-		SpeakerSeperation spsep = new SpeakerSeperation(gespraechsOrdner, temp, idName, myBundler);
+		SpeakerSeperation spsep = new SpeakerSeperation(gespraechsOrdner, temp, idName, myBundler, translator);
 		spsep.processFiles();
 		// spsep.initalizeData();
 
@@ -54,7 +59,7 @@ public class SpeechToText {
 		myBundler.adaptSnippetlist();
 		myBundler.speichereDialoginTXT(outputDestination, idName);
 		myBundler.generiereJSON(idName, outputDestination, jsonInputPath);
-		myBundler.reSetInitials();
+		myBundler.reSetInitialsBundler();
 
 	}
 }

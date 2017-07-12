@@ -7,7 +7,7 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Properties;
 
-public class Verzeichnismanager {
+public class Verzeichnismanager extends Object {
 
 	public static void main(String... args) throws Exception {
 
@@ -23,6 +23,7 @@ public class Verzeichnismanager {
 		stream.close();
 		String ffmpegpath = properties.getProperty("ffmpegpath");
 		String gespraechsVerzeichnisPfad = properties.getProperty("gespraechsVerzeichnisPfad");
+		String translator = properties.getProperty("translator");
 
 		File globalFfmpegExe = new File(ffmpegpath);
 		File gespraechsOrdnerVerzeichnis = new File(gespraechsVerzeichnisPfad);
@@ -36,11 +37,10 @@ public class Verzeichnismanager {
 		// Outputordner auf gespraechsVerzeichnis-ebene erstellen
 		File output = new File(gespraechsUeberVerzeichnis + "\\output");
 		output.mkdir();
-		
 //		String[] translatedDailogIdNames = getTranslatedDialogIdNames(output);
 //		setIdToNewFiles(translatedDailogIdNames, gespraechsOrdnerArray, gespraechsOrdnerVerzeichnis);
 
-		SpeechToText mySpeechToText = new SpeechToText();
+		SpeechToText mySpeechToText = new SpeechToText(translator);
 
 		// File json;
 		// File caInput;
@@ -54,32 +54,37 @@ public class Verzeichnismanager {
 
 		// ---------------------------------------------------------------------------------------------------------------------
 
-		for (int i = 0; i < gespraechsOrdnerArray.length; i++) {
-
-			// Kontrolle ob Gespraech bereits transkribiert wurde, innerhalb der
-			// schleife um
-			// Liste bei Durchlauf zu aktualisieren
-			String[] translatedDailogIdNames = getTranslatedDialogIdNames(output);
-
-			if (checkTranslated(gespraechsOrdnerArray[i].getName(), translatedDailogIdNames)) {
-				System.out.println("Gespraech bereits transkribiert");
-			}
-			
-
-			if (!checkTranslated(gespraechsOrdnerArray[i].getName(), translatedDailogIdNames)) {
-				System.out.println(gespraechsOrdnerArray[i].getPath());
-				File lokalFfmpeg = new File(gespraechsOrdnerArray[i].getPath() + "\\ffmpeg.exe");
-				copyFile(globalFfmpegExe, lokalFfmpeg);
-
-				File[] gespraechsDateien = gespraechsOrdnerArray[i].listFiles();
-
-				for (int j = 0; j < gespraechsDateien.length; j++) {
-					System.out.println(gespraechsDateien[j]);
-				}
-				Arrays.sort(gespraechsDateien);
-				mySpeechToText.invokeTranslation(output.toString(), gespraechsDateien[1], gespraechsDateien[2],
-						gespraechsDateien[3], gespraechsOrdnerArray[i], temp, lokalFfmpeg);
-			}
+		 for (int i = 0; i < gespraechsOrdnerArray.length; i++) {
+		
+		 // Kontrolle ob Gespraech bereits transkribiert wurde, innerhalb der
+		 // schleife um
+		 // Liste bei Durchlauf zu aktualisieren
+		 String[] translatedDailogIdNames =
+		 getTranslatedDialogIdNames(output);
+		
+		 if (checkNameExistenceInOutput(gespraechsOrdnerArray[i].getName(),
+		 translatedDailogIdNames)) {
+		 System.out.println("Gespraech bereits transkribiert");
+		 }
+		
+		
+		 if (!checkNameExistenceInOutput(gespraechsOrdnerArray[i].getName(),
+		 translatedDailogIdNames)) {
+		 System.out.println(gespraechsOrdnerArray[i].getPath());
+		 File lokalFfmpeg = new File(gespraechsOrdnerArray[i].getPath() +
+		 "\\ffmpeg.exe");
+		 copyFile(globalFfmpegExe, lokalFfmpeg);
+		
+		 File[] gespraechsDateien = gespraechsOrdnerArray[i].listFiles();
+		
+		 for (int j = 0; j < gespraechsDateien.length; j++) {
+		 System.out.println(gespraechsDateien[j]);
+		 }
+		 Arrays.sort(gespraechsDateien);
+		 mySpeechToText.invokeTranslation(output.toString(),
+		 gespraechsDateien[1], gespraechsDateien[2],
+		 gespraechsDateien[3], gespraechsOrdnerArray[i], temp, lokalFfmpeg);
+		 }
 		 }
 		System.out.println("SUCCESSFULLY COMPLETED");
 	}
@@ -135,7 +140,7 @@ public class Verzeichnismanager {
 	 * @param translatedDailogIdNames
 	 * @return
 	 */
-	public boolean checkTranslated(String DialogIdName, String[] translatedDailogIdNames) {
+	public boolean checkNameExistenceInOutput(String DialogIdName, String[] translatedDailogIdNames) {
 
 		boolean isTranslated = false;
 
@@ -157,7 +162,8 @@ public class Verzeichnismanager {
 	 * @param gespraechsOrdnerArray
 	 *            an array containing all folders with the dialogues to be
 	 *            checked for transcription
-	 * @param gespraechsOrdnerVerzeichnis the directory containing all folders with the dialogues to be
+	 * @param gespraechsOrdnerVerzeichnis
+	 *            the directory containing all folders with the dialogues to be
 	 *            checked for transcription
 	 */
 	public void setIdToNewFiles(String[] translatedDailogIdNames, File[] gespraechsOrdnerArray,
@@ -167,30 +173,47 @@ public class Verzeichnismanager {
 		for (int i = 0; i < gespraechsOrdnerArray.length; i++) {
 
 			// Kontrolle ob bereits transkribiert
-			if (!checkTranslated(gespraechsOrdnerArray[i].getName(), translatedDailogIdNames)) {
+			if (!checkNameExistenceInOutput(gespraechsOrdnerArray[i].getName(), translatedDailogIdNames)) {
 
-			
-				GenerateUUID newIDgenerator = new GenerateUUID();
-				String newId = newIDgenerator.generiereStringID();
-				
+				String newId = generateNewId(translatedDailogIdNames);
+
 				File newIdName = new File(gespraechsOrdnerVerzeichnis.getPath() + "\\" + newId);
-				gespraechsOrdnerArray[i].renameTo(newIdName);
+				newIdName.mkdir();
+				// gespraechsOrdnerArray[i].renameTo(newIdName);
 
-				System.out.println("RRRRRRRRRRRRRRRR" + gespraechsOrdnerArray[i].getPath());
-				
-				File[] files = newIdName.listFiles();
+				System.out.println("RRRRRRRRRRRRRRRR" + newIdName.getPath());
 
+				File[] files = gespraechsOrdnerArray[i].listFiles();
+				Arrays.sort(files);
 				// Dateien im Ordner umbenennen
 				for (int j = 0; j < files.length; j++) {
 					File newNameFile = new File(
 							newIdName.toString() + "\\" + newIdName.getName() + "_" + j + endings[j]);
-					files[j].renameTo(newNameFile);
-
+					// files[j].renameTo(newNameFile);
+					try {
+						copyFile(files[j], newNameFile);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					files[j].delete();
 				}
-			
+
+				gespraechsOrdnerArray[i].delete();
 			}
 		}
 		System.out.println("RENAMED");
+	}
+
+	public String generateNewId(String[] existingIds) {
+
+		GenerateUUID newIDgenerator = new GenerateUUID();
+		String newId = newIDgenerator.generiereStringID();
+
+		if (checkNameExistenceInOutput(newId, existingIds)) {
+			newId = generateNewId(existingIds);
+		}
+
+		return newId;
 	}
 
 }

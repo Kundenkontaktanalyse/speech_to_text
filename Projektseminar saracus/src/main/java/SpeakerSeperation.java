@@ -78,14 +78,26 @@ public class SpeakerSeperation {
 	private double audioLength;
 	private double puffer = 0.3;
 	private TextBundler myBundler;
-	private AudioProcessing myAudioProcess;
+	private TranslatorInterface myTranslator;
 
-	public SpeakerSeperation(File gespraechsOrdner, File temp, String idName, TextBundler myBundler) {
+	public SpeakerSeperation(File gespraechsOrdner, File temp, String idName, TextBundler myBundler, String translator) {
 		this.gespraechsOrdner = gespraechsOrdner;
 		this.temp = temp;
 		this.idName = idName;
 		this.myBundler = myBundler;
-		myAudioProcess = new AudioProcessing(myBundler);
+		
+		try {
+			
+			@SuppressWarnings("rawtypes")
+			Class TranslatorInterface = Class.forName(translator);
+
+			myTranslator =  (TranslatorInterface) TranslatorInterface.newInstance();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+				
+		
 	}
 
 	// Methode zum Schneiden von AudioDateien: Legt die AudioSchnitte im
@@ -618,23 +630,6 @@ public class SpeakerSeperation {
 			}
 		}
 
-		// for (int i = 0; i < audiofilesKU.length; i++) {
-		// System.out.print(audiofilesKU[i].getAbsolutePath());
-		// if (audiofilesKU[i].isDirectory()) {
-		// System.out.print(" (Ordner)\n");
-		// } else {
-		// System.out.print(" (Datei)\n");
-		// }
-		// }
-		// System.out.println("-------------------");
-		// for (int i = 0; i < audiofilesCA.length; i++) {
-		// System.out.print(audiofilesCA[i].getAbsolutePath());
-		// if (audiofilesCA[i].isDirectory()) {
-		// System.out.print(" (Ordner)\n");
-		// } else {
-		// System.out.print(" (Datei)\n");
-		// }
-		// }
 
 		System.out.println("Speaker-Seperation abgeschlossen");
 	}
@@ -654,6 +649,8 @@ public class SpeakerSeperation {
 	 */
 	public void processFiles() throws IOException {
 
+//		TODO +99999 anpassen, bei true stimmt ende nicht
+		
 		initalizeData();
 		System.out.println("Beginn processFiles:");
         System.out.println("---------------------------------------------");
@@ -676,8 +673,12 @@ public class SpeakerSeperation {
 
 		for (int i = 0; i < (audiofilesKU.length + audiofilesCA.length); i++) {
 			if ((startzeitenKUrdy[currentPositionKU] <= startzeitenCArdy[currentPositionCA]) || (CAfinished)) {
-				myBundler.addGespraechsStruktur("\n Kunde:  " + currentPositionKU);
-				myAudioProcess.processAudio(audiofilesKU[currentPositionKU], "Customer", puffer);
+				 myTranslator.recognize(audiofilesKU[currentPositionKU].toString());
+				myBundler.addSnippet("Customer",  myTranslator.getTranscript(),
+						 myTranslator.getLengthOfAudio() - 2 * puffer,
+						(myTranslator.getConfidence() /
+								((int) (myTranslator.getLengthOfAudio() / 15) + 1)));
+				myTranslator.resetInitials();
 
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
 					currentPositionKU++;
@@ -687,8 +688,15 @@ public class SpeakerSeperation {
 				}
 			} else {
 				if ((startzeitenCArdy[currentPositionCA] <= startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
-					myBundler.addGespraechsStruktur("\n Agent:  " + currentPositionCA);
-					myAudioProcess.processAudio(audiofilesCA[currentPositionCA], "Agent", puffer);
+					myTranslator.recognize(audiofilesCA[currentPositionCA].toString());
+					myBundler.addSnippet("Agent", myTranslator.getTranscript(),
+							myTranslator.getLengthOfAudio() - 2 * puffer,
+							(myTranslator.getConfidence() /
+									((int) (myTranslator.getLengthOfAudio() / 15) + 1)));
+					myTranslator.resetInitials();
+					
+					
+					
 
 					if (currentPositionCA < startzeitenCArdy.length - 1) {
 						currentPositionCA++;

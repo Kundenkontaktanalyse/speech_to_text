@@ -13,7 +13,7 @@ public class Snippet {
 	private double length; // laenge des Schnipsels mm.ss
 	private float confidence; // Konfidenz-Score.
 	private int wordCount; //Anzahl Wörter im Schnipsel.
-	private String startingTimeMinSec ;
+	private String startingTimeMinSec = "2" ;
 	
 	
 	public Snippet(String role, String transcription, double length, float confidence){
