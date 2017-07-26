@@ -540,7 +540,7 @@ public class SpeakerSeperation {
 		// Identifizierung und Einfügen von 0.0: startzeit[] -> startzeitrdy[]
 		// 2) Falls Ende falsch und rest richtig (durch 3 und 1 eventuelle
 		// Fehler jz behoben: if abfrage und vergleich
-		// gegen gesamtdauer des audios geschieht in cutAudio
+		// gegen gesamtdauer des audios geschieht in cutAudio, da dort erst gesamtlänge durch inputstream ermittelt wird
 		//
 
 		// negative Zeit rausschneiden
@@ -649,7 +649,6 @@ public class SpeakerSeperation {
 	 */
 	public void processFiles() throws IOException {
 
-//		TODO +99999 anpassen, bei true stimmt ende nicht
 		
 		initalizeData();
 		System.out.println("Beginn processFiles:");
@@ -671,28 +670,104 @@ public class SpeakerSeperation {
 		boolean KUfinished = false;
 		boolean CAfinished = false;
 
+		
+	
+		
+		
+		double endOfLastProcessed = 0.0;
+		double endOfLastDiffRole;
+		double secSinceEndOfProceedingSnippet = 0.0;
+		
 		for (int i = 0; i < (audiofilesKU.length + audiofilesCA.length); i++) {
-			if ((startzeitenKUrdy[currentPositionKU] <= startzeitenCArdy[currentPositionCA]) || (CAfinished)) {
-				 myTranslator.recognize(audiofilesKU[currentPositionKU].toString());
-				myBundler.addSnippet("Customer",  myTranslator.getTranscript(),
+			
+			System.out.println("lastEnd " + endOfLastProcessed);
+			
+			if (((startzeitenKUrdy[currentPositionKU] <= startzeitenCArdy[currentPositionCA]) && (!KUfinished)) || (CAfinished)) {
+								
+				myTranslator.recognize(audiofilesKU[currentPositionKU].toString());
+				String transcript = myTranslator.getTranscript();
+				 
+//				TODO andrere if anpassen DONE???
+				myBundler.addSnippet("Customer",  transcript,
 						 myTranslator.getLengthOfAudio() - 2 * puffer,
 						(myTranslator.getConfidence() /
-								((int) (myTranslator.getLengthOfAudio() / 15) + 1)));
+								((int) (myTranslator.getLengthOfAudio() / 15) + 1)), startzeitenKUrdy[currentPositionKU]);
+				
+				
+				if(transcript!= null){
+					
+					int pointer = i;
+					while ( (myBundler.getSnippetArray()[pointer].getRole().equals("Customer")) && pointer>0){
+						pointer--;
+					}
+					
+					if(i==0){
+						endOfLastDiffRole = 0.0;				
+					} else {
+						endOfLastDiffRole = myBundler.getSnippetArray()[pointer].getEndTime();				
+					}
+				
+//				TODO DEBUGGEN falsches ergebnis -22
+					secSinceEndOfProceedingSnippet = startzeitenKUrdy[currentPositionKU] - Math.max(endOfLastDiffRole, endOfLastProcessed);
+					
+					if(currentPositionKU<endzeitenKUrdy.length){
+						endOfLastProcessed = endzeitenKUrdy[currentPositionKU];
+					}
+					
+					myBundler.getSnippetArray()[i].setSecSinceEndOfProceedingSnippet(secSinceEndOfProceedingSnippet);
+					
+				}
+				
+				
+				
+				
+				
 				myTranslator.resetInitials();
 
 				if (currentPositionKU < startzeitenKUrdy.length - 1) {
 					currentPositionKU++;
 				} else {
-					startzeitenKUrdy[currentPositionKU] = startzeitenCArdy[currentPositionCA] + 99999;
-					// KUfinished = true;
+					 KUfinished = true;
 				}
 			} else {
-				if ((startzeitenCArdy[currentPositionCA] <= startzeitenKUrdy[currentPositionKU]) || (KUfinished)) {
+				if (((startzeitenCArdy[currentPositionCA] <= startzeitenKUrdy[currentPositionKU]) && (!CAfinished)) || (KUfinished)) {
+					
 					myTranslator.recognize(audiofilesCA[currentPositionCA].toString());
-					myBundler.addSnippet("Agent", myTranslator.getTranscript(),
+					String transcript = myTranslator.getTranscript();
+					
+					
+					myBundler.addSnippet("Agent", transcript,
 							myTranslator.getLengthOfAudio() - 2 * puffer,
 							(myTranslator.getConfidence() /
-									((int) (myTranslator.getLengthOfAudio() / 15) + 1)));
+									((int) (myTranslator.getLengthOfAudio() / 15) + 1)), startzeitenCArdy[currentPositionCA]);
+					
+					
+					if(transcript!= null){
+						
+						int pointer = i;
+						while ( (myBundler.getSnippetArray()[pointer].getRole().equals("Agent")) && pointer>0){
+							pointer--;
+						}
+						
+						if(i==0){
+							endOfLastDiffRole = 0.0;				
+						} else {
+							endOfLastDiffRole = myBundler.getSnippetArray()[pointer].getEndTime();				
+						}
+					
+					
+						secSinceEndOfProceedingSnippet = startzeitenCArdy[currentPositionCA] - Math.max(endOfLastDiffRole, endOfLastProcessed);
+						
+						if(currentPositionCA<endzeitenCArdy.length){
+							endOfLastProcessed = endzeitenCArdy[currentPositionCA];
+						}
+						
+						myBundler.getSnippetArray()[i].setSecSinceEndOfProceedingSnippet(secSinceEndOfProceedingSnippet);
+						
+					}
+					
+					
+					
 					myTranslator.resetInitials();
 					
 					
@@ -701,14 +776,13 @@ public class SpeakerSeperation {
 					if (currentPositionCA < startzeitenCArdy.length - 1) {
 						currentPositionCA++;
 					} else {
-						startzeitenCArdy[currentPositionCA] = startzeitenKUrdy[currentPositionKU] + 99999;
-						// CAfinished = true;
+						 CAfinished = true;
 					}
 				}
 
 			}
 		}
-
+		
 	}
 	
 	public double getAudioLength(){

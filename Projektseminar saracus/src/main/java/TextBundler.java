@@ -10,11 +10,18 @@ public class TextBundler {
 	private String uuidString;
 	private Gson gsonIn = new Gson(); // Gson-Element
 	private JsonElement fromGson; // Json-Input-Element mit Metadaten
-	private Snippet[] snippetlist; // Schnipselliste
+	private Snippet[] snippetArray; // Schnipselliste
 	private int counter = 0; // Counter zum befüllen des Arrays
 	private double audioLength;
 	private String cuttedFinalDialogue;
+	private double naturalPauseThreshold = 1.3; // number of seconds passed until a pause is considered unnatural
+//	private int naturalParallellySpokenWordsThreshold = 2; 	// number of Words that are accepted to be spoken without
+//															// counting for OverlappingOccurances + -duration
 
+	private double searchPauseThreshold = 15.0; 
+	//TODO
+	
+	
 	public TextBundler(String uuidString) {
 		this.uuidString = uuidString;
 	}
@@ -129,7 +136,10 @@ public class TextBundler {
 				getWordsPerSpeaker("Agent"), getWordsPerSpeaker("Customer"), wordsPerAgentFragment,
 				wordsPerCustomerFragment, identifySingleSpeakerOccurence("Agent"),
 				identifySingleSpeakerOccurence("Customer"), getSpeechTimeSinglePerson("Agent"),
-				getSpeechTimeSinglePerson("Customer"));
+				getSpeechTimeSinglePerson("Customer"), getAggrOverlappingSpeechOccurances(), getAggrOverlappingSpeechDuration(),
+				getUnnaturalPauseOccurances("Customer"), getAggrUnnaturalPauseDuration("Customer"),
+				getUnnaturalPauseOccurances("Agent"), getAggrUnnaturalPauseDuration("Agent")
+);
 
 		// System.out.println(konfidenzListenListe.getFirst().toString());
 		try {
@@ -166,7 +176,11 @@ public class TextBundler {
 	 *            groeße des arrays.
 	 */
 	public void setSnippetListSize(int i) {
-		snippetlist = new Snippet[i];
+		snippetArray = new Snippet[i];
+	}
+	
+	public Snippet[] getSnippetArray() {
+		return snippetArray;
 	}
 
 	/**
@@ -178,9 +192,9 @@ public class TextBundler {
 	 */
 	public ArrayList<Snippet> adaptSnippetlist() {
 		int idcounter = 0;
-		for (int i = 0; i < snippetlist.length; i++) {
-			if (snippetlist[i] != null && snippetlist[i].getTranscription() != null) {
-				cuttedSnippetlist.add(snippetlist[i]);
+		for (int i = 0; i < snippetArray.length; i++) {
+			if (snippetArray[i] != null && snippetArray[i].getTranscription() != null) {
+				cuttedSnippetlist.add(snippetArray[i]);
 				String idcounterString = String.valueOf(idcounter);
 				cuttedSnippetlist.get(idcounter)
 						.setSnippetId(uuidString + "-" + cuttedSnippetlist.get(idcounter).getRole() + idcounterString);
@@ -204,8 +218,8 @@ public class TextBundler {
 	 *            die von der Google-Api übermittelte Sicherheit, dass es sich
 	 *            um das richtige Ergebnishandelt (zwischen 0 und 1)
 	 */
-	public void addSnippet(String role, String transcript, double length, float confidence) {
-		snippetlist[counter] = new Snippet(role, transcript, length, confidence);
+	public void addSnippet(String role, String transcript, double length, float confidence, double startTime) {
+		snippetArray[counter] = new Snippet(role, transcript, length, confidence, startTime);
 
 		// snippetlist[counter].countWords();
 		counter++;
@@ -221,7 +235,63 @@ public class TextBundler {
 		}
 		return wordsPerSpeaker;
 	}
+	
+	// for-schleifen durchlauf start bei i=1, da anfangsstille technisch bedingt ist und nicht einberechnet werden soll
+	// overlapping von i=0 ist per definition = 0, sodass auch hier bei i=1 gestartet werden kann
+	public int getAggrOverlappingSpeechOccurances(){
+		int occurances = 0;
+		
+		for (int i = 1; i < cuttedSnippetlist.size(); i++) {
+			if ((cuttedSnippetlist.get(i).secSinceEndOfProceedingSnippet()<0)
+//					&& (cuttedSnippetlist.get(i).getWordCount() > naturalParallellySpokenWordsThreshold)
+					){
+				occurances++;
+			}
+		}
+		return occurances;
+	}
+	
+	public double getAggrOverlappingSpeechDuration(){
+		double duration = 0.0;
+		
+		for (int i = 1; i < cuttedSnippetlist.size(); i++) {
+			if ((cuttedSnippetlist.get(i).secSinceEndOfProceedingSnippet()<0)
+//					&&(cuttedSnippetlist.get(i).getWordCount() > naturalParallellySpokenWordsThreshold)
+					){
+				duration = duration + Math.min(cuttedSnippetlist.get(i).secSinceEndOfProceedingSnippet()*(-1), cuttedSnippetlist.get(i).getLenght());
+			}
+		}
+		return duration;
+	}
 
+	
+	
+	public int getUnnaturalPauseOccurances(String role){
+		int occurances = 0;
+		
+		for (int i = 1; i < cuttedSnippetlist.size(); i++) {
+			if ((cuttedSnippetlist.get(i).secSinceEndOfProceedingSnippet() >= naturalPauseThreshold) &&
+			(cuttedSnippetlist.get(i).getRole().equals(role)) ){
+				occurances++;
+			}
+		}
+		return occurances;
+	}
+	
+	public double getAggrUnnaturalPauseDuration(String role){
+		double duration = 0.0;
+		
+		for (int i = 1; i < cuttedSnippetlist.size(); i++) {
+			if ((cuttedSnippetlist.get(i).secSinceEndOfProceedingSnippet() >= naturalPauseThreshold) &&
+				(cuttedSnippetlist.get(i).getRole().equals(role)) ){
+				duration = duration + cuttedSnippetlist.get(i).secSinceEndOfProceedingSnippet();
+			}
+		}
+		return duration;
+	}
+	
+	
+	
 	public double getSpeechTimeSinglePerson(String role) {
 		double speechTime = 0;
 		for (int i = 0; i < cuttedSnippetlist.size(); i++) {
@@ -232,20 +302,7 @@ public class TextBundler {
 		return speechTime;
 	}
 
-	public void addStartingTimeToSnippet() {
-		double counterInSeconds = 0;
-		int timeInMin = 0;
-		int timeInSec = 0;
-		String timeMinSec;
-
-		for (int i = 0; i < cuttedSnippetlist.size(); i++) {
-			timeInMin = (int) counterInSeconds / 60;
-			timeInSec = (int) counterInSeconds % 60;
-			timeMinSec = (timeInMin + ":" + timeInSec);
-			cuttedSnippetlist.get(i).setStartingTimeMinSec(timeMinSec);
-			counterInSeconds = counterInSeconds + cuttedSnippetlist.get(i).getLenght();
-		}
-	}
+	
 
 	public String cutDialogue() {
 		System.out.println("cutDialogue");

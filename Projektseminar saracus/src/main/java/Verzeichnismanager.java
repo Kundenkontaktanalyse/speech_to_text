@@ -5,9 +5,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+
+//	TODO: Arary out of bounds in initalizeData audioChannels bei transkription von 3 Gesprächen
+// erste beiden kurzen gehen, der dritte lange nicht
 
 public class Verzeichnismanager extends Object {
+	
+	Logmanager myLogmanager;
 
 	public static void main(String... args) throws Exception {
 
@@ -16,6 +24,8 @@ public class Verzeichnismanager extends Object {
 	}
 
 	public void run() throws Exception {
+		
+		myLogmanager = new Logmanager();
 
 		Properties properties = new Properties();
 		BufferedInputStream stream = new BufferedInputStream(new FileInputStream("s2tProperties.properties"));
@@ -37,8 +47,14 @@ public class Verzeichnismanager extends Object {
 		// Outputordner auf gespraechsVerzeichnis-ebene erstellen
 		File output = new File(gespraechsUeberVerzeichnis + "\\output");
 		output.mkdir();
-//		String[] translatedDailogIdNames = getTranslatedDialogIdNames(output);
-//		setIdToNewFiles(translatedDailogIdNames, gespraechsOrdnerArray, gespraechsOrdnerVerzeichnis);
+		
+		
+		File log = new File(gespraechsUeberVerzeichnis + "\\log");
+        log.mkdir();
+		// String[] translatedDailogIdNames =
+		// getTranslatedDialogIdNames(output);
+		// setIdToNewFiles(translatedDailogIdNames, gespraechsOrdnerArray,
+		// gespraechsOrdnerVerzeichnis);
 
 		SpeechToText mySpeechToText = new SpeechToText(translator);
 
@@ -54,38 +70,45 @@ public class Verzeichnismanager extends Object {
 
 		// ---------------------------------------------------------------------------------------------------------------------
 
-		 for (int i = 0; i < gespraechsOrdnerArray.length; i++) {
+		for (int i = 0; i < gespraechsOrdnerArray.length; i++) {
+
+			
+			// Kontrolle ob Gespraech bereits transkribiert wurde, innerhalb der
+			// schleife um
+			// Liste bei Durchlauf zu aktualisieren
+			String[] translatedDailogIdNames = getTranslatedDialogIdNames(output);
+
+			if (checkNameExistenceInOutput(gespraechsOrdnerArray[i].getName(), translatedDailogIdNames)) {
+				System.out.println("Gespraech bereits transkribiert");
+			}
+
+			if (!checkNameExistenceInOutput(gespraechsOrdnerArray[i].getName(), translatedDailogIdNames)) {
+				myLogmanager.addLogEntry(gespraechsOrdnerArray[i].getName());
+
+				System.out.println(gespraechsOrdnerArray[i].getPath());
+				File lokalFfmpeg = new File(gespraechsOrdnerArray[i].getPath() + "\\ffmpeg.exe");
+				copyFile(globalFfmpegExe, lokalFfmpeg);
+
+				File[] gespraechsDateien = gespraechsOrdnerArray[i].listFiles();
+
+				for (int j = 0; j < gespraechsDateien.length; j++) {
+					System.out.println(gespraechsDateien[j]);
+				}
+				Arrays.sort(gespraechsDateien);
+				mySpeechToText.invokeTranslation(output.toString(), gespraechsDateien[1], gespraechsDateien[2],
+						gespraechsDateien[3], gespraechsOrdnerArray[i], temp, lokalFfmpeg);
+				
+				myLogmanager.logList.getLast().setProcessEnd(new Date());
+				
+				myLogmanager.logList.getLast().setProcessDuration(myLogmanager.getDateDiff(
+						myLogmanager.logList.getLast().getProcessStart(),
+						myLogmanager.logList.getLast().getProcessEnd(),
+						TimeUnit.SECONDS));
+			}
+		}
 		
-		 // Kontrolle ob Gespraech bereits transkribiert wurde, innerhalb der
-		 // schleife um
-		 // Liste bei Durchlauf zu aktualisieren
-		 String[] translatedDailogIdNames =
-		 getTranslatedDialogIdNames(output);
+		myLogmanager.printLogsInTxt(log);
 		
-		 if (checkNameExistenceInOutput(gespraechsOrdnerArray[i].getName(),
-		 translatedDailogIdNames)) {
-		 System.out.println("Gespraech bereits transkribiert");
-		 }
-		
-		
-		 if (!checkNameExistenceInOutput(gespraechsOrdnerArray[i].getName(),
-		 translatedDailogIdNames)) {
-		 System.out.println(gespraechsOrdnerArray[i].getPath());
-		 File lokalFfmpeg = new File(gespraechsOrdnerArray[i].getPath() +
-		 "\\ffmpeg.exe");
-		 copyFile(globalFfmpegExe, lokalFfmpeg);
-		
-		 File[] gespraechsDateien = gespraechsOrdnerArray[i].listFiles();
-		
-		 for (int j = 0; j < gespraechsDateien.length; j++) {
-		 System.out.println(gespraechsDateien[j]);
-		 }
-		 Arrays.sort(gespraechsDateien);
-		 mySpeechToText.invokeTranslation(output.toString(),
-		 gespraechsDateien[1], gespraechsDateien[2],
-		 gespraechsDateien[3], gespraechsOrdnerArray[i], temp, lokalFfmpeg);
-		 }
-		 }
 		System.out.println("SUCCESSFULLY COMPLETED");
 	}
 

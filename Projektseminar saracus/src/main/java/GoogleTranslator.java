@@ -30,10 +30,8 @@ public class GoogleTranslator implements TranslatorInterface {
 	private double lengthOfAudio;
 	private String transcript;
 	private float confidence;
-	private TextBundler myBundler;
 
 	public GoogleTranslator( ) {
-//		this.myBundler = myBundler;
 	}
 
 	public void recognize(String filePath) {
